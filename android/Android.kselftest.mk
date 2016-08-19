@@ -14,13 +14,120 @@
 # limitations under the License.
 #
 
-module_testname := kcmp/kcmp_test
-module_src_files := kcmp/kcmp_test.c
-module_cflags :=
-module_c_includes :=
-include $(build_kselftest_test)
+# Ftrace test
+module_prebuilt := ftrace/ftracetest
+module_src_files := ftrace/ftracetest
+include $(build_kselftest_prebuilt)
 
-# Futex tests
+module_prebuilt := ftrace/test.d/trigger/trigger-hist
+module_src_files := ftrace/test.d/trigger/trigger-hist.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/trigger/trigger-traceonoff
+module_src_files := ftrace/test.d/trigger/trigger-traceonoff.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/trigger/trigger-hist-mod
+module_src_files := ftrace/test.d/trigger/trigger-hist-mod.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/trigger/trigger-stacktrace
+module_src_files := ftrace/test.d/trigger/trigger-stacktrace.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/trigger/trigger-multihist
+module_src_files := ftrace/test.d/trigger/trigger-multihist.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/trigger/trigger-filter
+module_src_files := ftrace/test.d/trigger/trigger-filter.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/trigger/trigger-snapshot
+module_src_files := ftrace/test.d/trigger/trigger-snapshot.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/trigger/trigger-eventonoff
+module_src_files := ftrace/test.d/trigger/trigger-eventonoff.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/kprobe/busy_check
+module_src_files := ftrace/test.d/kprobe/busy_check.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/kprobe/kretprobe_args
+module_src_files := ftrace/test.d/kprobe/kretprobe_args.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/kprobe/kprobe_ftrace
+module_src_files := ftrace/test.d/kprobe/kprobe_ftrace.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/kprobe/add_and_remove
+module_src_files := ftrace/test.d/kprobe/add_and_remove.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/kprobe/kprobe_args
+module_src_files := ftrace/test.d/kprobe/kprobe_args.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/functions
+module_src_files := ftrace/test.d/functions
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/00basic/basic2
+module_src_files := ftrace/test.d/00basic/basic2.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/00basic/basic4
+module_src_files := ftrace/test.d/00basic/basic4.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/00basic/basic1
+module_src_files := ftrace/test.d/00basic/basic1.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/00basic/basic3
+module_src_files := ftrace/test.d/00basic/basic3.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/template
+module_src_files := ftrace/test.d/template
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/event/event-pid
+module_src_files := ftrace/test.d/event/event-pid.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/event/subsystem-enable
+module_src_files := ftrace/test.d/event/subsystem-enable.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/event/event-enable
+module_src_files := ftrace/test.d/event/event-enable.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/event/toplevel-enable
+module_src_files := ftrace/test.d/event/toplevel-enable.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/instances/instance
+module_src_files := ftrace/test.d/instances/instance.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/instances/instance-event
+module_src_files := ftrace/test.d/instances/instance-event.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/ftrace/func_profiler
+module_src_files := ftrace/test.d/ftrace/func_profiler.tc
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := ftrace/test.d/ftrace/fgraph-filter-stack
+module_src_files := ftrace/test.d/ftrace/fgraph-filter-stack.tc
+include $(build_kselftest_prebuilt)
+
+# Futex test
 module_testname := futex/functional/futex_wait_timeout
 module_src_files := futex/functional/futex_wait_timeout.c
 module_cflags := -g -O2 -Wall -D_GNU_SOURCE -pthread -pthread -lrt
@@ -32,18 +139,6 @@ module_src_files := futex/functional/futex_wait_wouldblock.c
 module_cflags := -g -O2 -Wall -D_GNU_SOURCE -pthread -pthread -lrt
 module_c_includes := futex/include .
 include $(build_kselftest_test)
-
-#module_testname := futex/functional/futex_requeue_pi
-#module_src_files := futex/functional/futex_requeue_pi.c
-#module_cflags := -g -O2 -Wall -D_GNU_SOURCE -pthread -pthread -lrt
-#module_c_includes := futex/include .
-#include $(build_kselftest_test)
-
-#module_testname := futex/functional/futex_requeue_pi_signal_restart
-#module_src_files := futex/functional/futex_requeue_pi_signal_restart.c
-#module_cflags := -g -O2 -Wall -D_GNU_SOURCE -pthread -pthread -lrt
-#module_c_includes := futex/include .
-#include $(build_kselftest_test)
 
 module_testname := futex/functional/futex_requeue_pi_mismatched_ops
 module_src_files := futex/functional/futex_requeue_pi_mismatched_ops.c
@@ -63,7 +158,14 @@ module_cflags := -g -O2 -Wall -D_GNU_SOURCE -pthread -pthread -lrt
 module_c_includes := futex/include .
 include $(build_kselftest_test)
 
-# Timer tests
+# Kcmp test
+module_testname := kcmp/kcmp_test
+module_src_files := kcmp/kcmp_test.c
+module_cflags :=
+module_c_includes :=
+include $(build_kselftest_test)
+
+# Timer test
 module_testname := timers/posix_timers
 module_src_files := timers/posix_timers.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
@@ -87,12 +189,6 @@ module_src_files := timers/set-timer-lat.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
 include $(build_kselftest_test)
-
-#module_testname := timers/mqueue-lat
-#module_src_files := timers/mqueue-lat.c
-#module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
-#module_c_includes :=
-#include $(build_kselftest_test)
 
 module_testname := timers/inconsistency-check
 module_src_files := timers/inconsistency-check.c
@@ -123,12 +219,6 @@ module_src_files := timers/alarmtimer-suspend.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
 include $(build_kselftest_test)
-
-#module_testname := timers/valid-adjtimex
-#module_src_files := timers/valid-adjtimex.c
-#module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
-#module_c_includes :=
-#include $(build_kselftest_test)
 
 module_testname := timers/adjtick
 module_src_files := timers/adjtick.c
@@ -184,3 +274,7 @@ module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
 include $(build_kselftest_test)
 
+# User test
+module_prebuilt := user/test_user_copy
+module_src_files := user/test_user_copy.sh
+include $(build_kselftest_prebuilt)

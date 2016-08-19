@@ -36,4 +36,5 @@ kselftest_cflags := \
     -Werror \
 
 build_kselftest_test := $(kselftest_root)/android/Android.test.mk
+build_kselftest_prebuilt := $(kselftest_root)/android/Android.prebuilt.mk
 include $(kselftest_root)/android/Android.kselftest.mk

@@ -23,8 +23,8 @@ module_path := $(dir $(module_src_files))
 LOCAL_MODULE := $(module_name)
 LOCAL_MODULE_STEM_32 := $(module_stem)
 LOCAL_MODULE_STEM_64 := $(module_stem)
-LOCAL_MODULE_PATH_32 := $($(TARGET_2ND_ARCH_VAR_PREFIX)TARGET_OUT_DATA_NATIVE_TESTS)/linux-kselftest
-LOCAL_MODULE_PATH_64 := $(TARGET_OUT_DATA_NATIVE_TESTS)/linux-kselftest
+LOCAL_MODULE_PATH_32 := $($(TARGET_2ND_ARCH_VAR_PREFIX)TARGET_OUT_DATA_NATIVE_TESTS)/linux-kselftest/$(module_path)
+LOCAL_MODULE_PATH_64 := $(TARGET_OUT_DATA_NATIVE_TESTS)/linux-kselftest/$(module_path)
 LOCAL_MODULE_TAGS := optional
 LOCAL_MULTILIB := both
 
@@ -32,7 +32,17 @@ LOCAL_CFLAGS := $(kselftest_cflags) $(module_cflags)
 LOCAL_C_INCLUDES := $(addprefix $(kselftest_root)/$(kselftest_dir)/,$(module_c_includes))
 LOCAL_SRC_FILES := $(addprefix $(kselftest_dir)/,$(module_src_files))
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.test.mk
-LOCAL_COMPATIBILITY_SUITE := vts
 
 include $(BUILD_EXECUTABLE)
 
+vts_src_file_32 := $(LOCAL_MODULE_PATH_32)/$(LOCAL_MODULE_STEM_32)
+vts_src_file_64 := $(LOCAL_MODULE_PATH_64)/$(LOCAL_MODULE_STEM_64)
+vts_dst_dir := $(module_path)
+include $(kselftest_root)/android/Android.vts_testcase.mk
+
+module_name :=
+module_stem :=
+module_path :=
+vts_src_file_32 :=
+vts_src_file_64 :=
+vts_dst_dir :=
