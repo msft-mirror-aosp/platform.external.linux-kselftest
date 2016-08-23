@@ -14,6 +14,27 @@
 # limitations under the License.
 #
 
+disabled_target := 0
+
+# TODO(trong): enable kselftest for darwin and windows hosts.
+ifneq (linux, $(HOST_OS)
+disabled_target := 1
+endif
+
+# TODO(trong): enable kselftest for mips eng.
+ifneq (,$(findstring mips, $(TARGET_PRODUCT)))
+ifeq (eng, $(TARGET_BUILD_VARIANT))
+disabled_target := 1
+endif
+endif
+
+# Kselftests are only for development and not for production.
+ifeq (,$(filter userdebug eng, $(TARGET_BUILD_VARIANT)))
+disabled_target := 1
+endif
+
+ifeq (0, $(disabled_target))
+
 LOCAL_PATH := $(call my-dir)
 kselftest_root := $(LOCAL_PATH)
 kselftest_dir := tools/testing/selftests
@@ -38,3 +59,5 @@ kselftest_cflags := \
 build_kselftest_test := $(kselftest_root)/android/Android.test.mk
 build_kselftest_prebuilt := $(kselftest_root)/android/Android.prebuilt.mk
 include $(kselftest_root)/android/Android.kselftest.mk
+
+endif
