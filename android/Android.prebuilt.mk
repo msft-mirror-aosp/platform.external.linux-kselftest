@@ -22,8 +22,10 @@ module_path := $(dir $(module_src_files))
 
 prebuilt_src_file := $(kselftest_root)/$(kselftest_dir)/$(module_src_files)
 
-PRIVATE_CUSTOM_TOOL = $(ACP) -fp $< $@ && \
-    sed -i -e 's?/bin/sh?/system/bin/sh?' -e 's?/bin/bash?/system/bin/sh?' $@
+PRIVATE_CUSTOM_TOOL = $(ACP) -fp $< $@ &&  sed -i \
+    -e 's?/bin/sh?/system/bin/sh?' \
+    -e 's?/bin/bash?/system/bin/sh?' \
+    -e 's?/bin/echo?echo?' $@
 
 LOCAL_MODULE := $(module_name)-32
 LOCAL_INSTALLED_MODULE_STEM := $(module_stem)
