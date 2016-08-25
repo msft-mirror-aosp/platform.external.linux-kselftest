@@ -53,6 +53,7 @@ kselftest_cflags := \
     -Wno-shift-negative-value \
     -Wno-switch \
     -Wno-absolute-value \
+    -Wno-non-literal-null-conversion \
     -Wall \
     -Werror \
 

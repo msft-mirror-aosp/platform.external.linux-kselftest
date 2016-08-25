@@ -14,6 +14,37 @@
 # limitations under the License.
 #
 
+# Cpu-hotplug test
+module_prebuilt := cpu-hotplug/cpu-on-off-test
+module_src_files := cpu-hotplug/cpu-on-off-test.sh
+include $(build_kselftest_prebuilt)
+
+# Efivarfs test
+module_prebuilt := efivarfs/efivarfs
+module_src_files := efivarfs/efivarfs.sh
+include $(build_kselftest_prebuilt)
+
+module_testname := efivarfs/open-unlink
+module_src_files := efivarfs/open-unlink.c
+module_cflags := -Wall
+module_c_includes :=
+include $(build_kselftest_test)
+
+module_testname := efivarfs/create-read
+module_src_files := efivarfs/create-read.c
+module_cflags := -Wall
+module_c_includes :=
+include $(build_kselftest_test)
+
+# Firmware test
+module_prebuilt := firmware/fw_filesystem
+module_src_files := firmware/fw_filesystem.sh
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := firmware/fw_userhelper
+module_src_files := firmware/fw_userhelper.sh
+include $(build_kselftest_prebuilt)
+
 # Ftrace test
 module_prebuilt := ftrace/ftracetest
 module_src_files := ftrace/ftracetest
@@ -165,6 +196,92 @@ module_cflags :=
 module_c_includes :=
 include $(build_kselftest_test)
 
+# Lib test
+module_prebuilt := lib/printf
+module_src_files := lib/printf.sh
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := lib/bitmap
+module_src_files := lib/bitmap.sh
+include $(build_kselftest_prebuilt)
+
+# Memory-hotplug test
+module_prebuilt := memory-hotplug/mem-on-off-test
+module_src_files := memory-hotplug/mem-on-off-test.sh
+include $(build_kselftest_prebuilt)
+
+# Mount test
+module_testname := mount/unprivileged-remount-test
+module_src_files := mount/unprivileged-remount-test.c
+module_cflags := -Wall -O2
+module_c_includes :=
+include $(build_kselftest_test)
+
+# Net test
+module_prebuilt := net/test_bpf
+module_src_files := net/test_bpf.sh
+include $(build_kselftest_prebuilt)
+
+module_testname := net/socket
+module_src_files := net/socket.c
+module_cflags := -Wall -O2 -g
+module_c_includes :=
+include $(build_kselftest_test)
+
+module_testname := net/psock_fanout
+module_src_files := net/psock_fanout.c
+module_cflags := -Wall -O2 -g
+module_c_includes :=
+include $(build_kselftest_test)
+
+module_testname := net/reuseport_dualstack
+module_src_files := net/reuseport_dualstack.c
+module_cflags := -Wall -O2 -g
+module_c_includes :=
+include $(build_kselftest_test)
+
+# Pstore test
+module_prebuilt := pstore/pstore_tests
+module_src_files := pstore/pstore_tests
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := pstore/pstore_post_reboot_tests
+module_src_files := pstore/pstore_post_reboot_tests
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := pstore/common_tests
+module_src_files := pstore/common_tests
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := pstore/pstore_crash_test
+module_src_files := pstore/pstore_crash_test
+include $(build_kselftest_prebuilt)
+
+# Ptrace test
+module_testname := ptrace/peeksiginfo
+module_src_files := ptrace/peeksiginfo.c
+module_cflags := -Wall
+module_c_includes :=
+include $(build_kselftest_test)
+
+# Static keys test
+module_prebuilt := static_keys/test_static_keys
+module_src_files := static_keys/test_static_keys.sh
+include $(build_kselftest_prebuilt)
+
+# Sysctl
+module_prebuilt := sysctl/run_numerictests
+module_src_files := sysctl/run_numerictests
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := sysctl/run_stringtests
+module_src_files := sysctl/run_stringtests
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := sysctl/common_tests
+module_src_files := sysctl/common_tests
+include $(build_kselftest_prebuilt)
+
 # Timer test
 module_testname := timers/posix_timers
 module_src_files := timers/posix_timers.c
@@ -278,3 +395,47 @@ include $(build_kselftest_test)
 module_prebuilt := user/test_user_copy
 module_src_files := user/test_user_copy.sh
 include $(build_kselftest_prebuilt)
+
+# Vm test
+module_testname := vm/compaction_test
+module_src_files := vm/compaction_test.c
+module_cflags := -Wall -lrt
+module_c_includes :=
+include $(build_kselftest_test)
+
+module_testname := vm/hugepage-mmap
+module_src_files := vm/hugepage-mmap.c
+module_cflags := -Wall -lrt
+module_c_includes :=
+include $(build_kselftest_test)
+
+module_testname := vm/hugepage-shm
+module_src_files := vm/hugepage-shm.c
+module_cflags := -Wall -lrt
+module_c_includes :=
+include $(build_kselftest_test)
+
+module_testname := vm/map_hugetlb
+module_src_files := vm/map_hugetlb.c
+module_cflags := -Wall -lrt
+module_c_includes :=
+include $(build_kselftest_test)
+
+module_testname := vm/mlock2-tests
+module_src_files := vm/mlock2-tests.c
+module_cflags := -Wall -lrt
+module_c_includes :=
+include $(build_kselftest_test)
+
+module_testname := vm/on-fault-limit
+module_src_files := vm/on-fault-limit.c
+module_cflags := -Wall -lrt
+module_c_includes :=
+include $(build_kselftest_test)
+
+module_testname := vm/transhuge-stress
+module_src_files := vm/transhuge-stress.c
+module_cflags := -Wall -lrt
+module_c_includes :=
+include $(build_kselftest_test)
+
