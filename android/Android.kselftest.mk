@@ -50,58 +50,6 @@ module_prebuilt := ftrace/ftracetest
 module_src_files := ftrace/ftracetest
 include $(build_kselftest_prebuilt)
 
-module_prebuilt := ftrace/test.d/trigger/trigger-hist
-module_src_files := ftrace/test.d/trigger/trigger-hist.tc
-include $(build_kselftest_prebuilt)
-
-module_prebuilt := ftrace/test.d/trigger/trigger-traceonoff
-module_src_files := ftrace/test.d/trigger/trigger-traceonoff.tc
-include $(build_kselftest_prebuilt)
-
-module_prebuilt := ftrace/test.d/trigger/trigger-hist-mod
-module_src_files := ftrace/test.d/trigger/trigger-hist-mod.tc
-include $(build_kselftest_prebuilt)
-
-module_prebuilt := ftrace/test.d/trigger/trigger-stacktrace
-module_src_files := ftrace/test.d/trigger/trigger-stacktrace.tc
-include $(build_kselftest_prebuilt)
-
-module_prebuilt := ftrace/test.d/trigger/trigger-multihist
-module_src_files := ftrace/test.d/trigger/trigger-multihist.tc
-include $(build_kselftest_prebuilt)
-
-module_prebuilt := ftrace/test.d/trigger/trigger-filter
-module_src_files := ftrace/test.d/trigger/trigger-filter.tc
-include $(build_kselftest_prebuilt)
-
-module_prebuilt := ftrace/test.d/trigger/trigger-snapshot
-module_src_files := ftrace/test.d/trigger/trigger-snapshot.tc
-include $(build_kselftest_prebuilt)
-
-module_prebuilt := ftrace/test.d/trigger/trigger-eventonoff
-module_src_files := ftrace/test.d/trigger/trigger-eventonoff.tc
-include $(build_kselftest_prebuilt)
-
-module_prebuilt := ftrace/test.d/kprobe/busy_check
-module_src_files := ftrace/test.d/kprobe/busy_check.tc
-include $(build_kselftest_prebuilt)
-
-module_prebuilt := ftrace/test.d/kprobe/kretprobe_args
-module_src_files := ftrace/test.d/kprobe/kretprobe_args.tc
-include $(build_kselftest_prebuilt)
-
-module_prebuilt := ftrace/test.d/kprobe/kprobe_ftrace
-module_src_files := ftrace/test.d/kprobe/kprobe_ftrace.tc
-include $(build_kselftest_prebuilt)
-
-module_prebuilt := ftrace/test.d/kprobe/add_and_remove
-module_src_files := ftrace/test.d/kprobe/add_and_remove.tc
-include $(build_kselftest_prebuilt)
-
-module_prebuilt := ftrace/test.d/kprobe/kprobe_args
-module_src_files := ftrace/test.d/kprobe/kprobe_args.tc
-include $(build_kselftest_prebuilt)
-
 module_prebuilt := ftrace/test.d/functions
 module_src_files := ftrace/test.d/functions
 include $(build_kselftest_prebuilt)
@@ -126,36 +74,12 @@ module_prebuilt := ftrace/test.d/template
 module_src_files := ftrace/test.d/template
 include $(build_kselftest_prebuilt)
 
-module_prebuilt := ftrace/test.d/event/event-pid
-module_src_files := ftrace/test.d/event/event-pid.tc
-include $(build_kselftest_prebuilt)
-
-module_prebuilt := ftrace/test.d/event/subsystem-enable
-module_src_files := ftrace/test.d/event/subsystem-enable.tc
-include $(build_kselftest_prebuilt)
-
-module_prebuilt := ftrace/test.d/event/event-enable
-module_src_files := ftrace/test.d/event/event-enable.tc
-include $(build_kselftest_prebuilt)
-
-module_prebuilt := ftrace/test.d/event/toplevel-enable
-module_src_files := ftrace/test.d/event/toplevel-enable.tc
-include $(build_kselftest_prebuilt)
-
 module_prebuilt := ftrace/test.d/instances/instance
 module_src_files := ftrace/test.d/instances/instance.tc
 include $(build_kselftest_prebuilt)
 
 module_prebuilt := ftrace/test.d/instances/instance-event
 module_src_files := ftrace/test.d/instances/instance-event.tc
-include $(build_kselftest_prebuilt)
-
-module_prebuilt := ftrace/test.d/ftrace/func_profiler
-module_src_files := ftrace/test.d/ftrace/func_profiler.tc
-include $(build_kselftest_prebuilt)
-
-module_prebuilt := ftrace/test.d/ftrace/fgraph-filter-stack
-module_src_files := ftrace/test.d/ftrace/fgraph-filter-stack.tc
 include $(build_kselftest_prebuilt)
 
 # Futex test
@@ -205,6 +129,13 @@ module_prebuilt := lib/bitmap
 module_src_files := lib/bitmap.sh
 include $(build_kselftest_prebuilt)
 
+# Membarrier test
+module_testname := membarrier/membarrier_test
+module_src_files := membarrier/membarrier_test.c
+module_cflags :=
+module_c_includes :=
+include $(build_kselftest_test)
+
 # Memory-hotplug test
 module_prebuilt := memory-hotplug/mem-on-off-test
 module_src_files := memory-hotplug/mem-on-off-test.sh
@@ -230,6 +161,12 @@ include $(build_kselftest_test)
 
 module_testname := net/psock_fanout
 module_src_files := net/psock_fanout.c
+module_cflags := -Wall -O2 -g
+module_c_includes :=
+include $(build_kselftest_test)
+
+module_testname := net/psock_tpacket
+module_src_files := net/psock_tpacket.c
 module_cflags := -Wall -O2 -g
 module_c_includes :=
 include $(build_kselftest_test)
@@ -333,6 +270,12 @@ include $(build_kselftest_test)
 
 module_testname := timers/alarmtimer-suspend
 module_src_files := timers/alarmtimer-suspend.c
+module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
+module_c_includes :=
+include $(build_kselftest_test)
+
+module_testname := timers/valid-adjtimex
+module_src_files := timers/valid-adjtimex.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
 include $(build_kselftest_test)

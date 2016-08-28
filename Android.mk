@@ -54,7 +54,8 @@ kselftest_cflags := \
     -Wno-switch \
     -Wno-absolute-value \
     -Wno-non-literal-null-conversion \
-    -Wall \
+    -Wno-unused-variable \
+    -Wno-unused-parameter \
     -Werror \
 
 build_kselftest_test := $(kselftest_root)/android/Android.test.mk
