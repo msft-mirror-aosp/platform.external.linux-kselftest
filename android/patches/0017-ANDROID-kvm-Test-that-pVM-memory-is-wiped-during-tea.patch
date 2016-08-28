@@ -1,7 +1,8 @@
-From a9dc703806031c8535c84c9905979f86dfaec1d3 Mon Sep 17 00:00:00 2001
+From bd511623ee96ec115f2887334e36e80f0624564a Mon Sep 17 00:00:00 2001
 From: Quentin Perret <qperret@google.com>
 Date: Thu, 17 Feb 2022 19:34:27 +0000
-Subject: [PATCH] ANDROID: kvm: Test that pVM memory is wiped during teardown
+Subject: [PATCH 17/24] ANDROID: kvm: Test that pVM memory is wiped during
+ teardown
 
 In protected KVM mode, we expect the hypervisor to protect guest secrets
 when they are torn down. Add a test checking this property by running a
@@ -13,57 +14,17 @@ functionality tested here hasn't at the time of writing. Once it does,
 this test should be sent upstream for review to replace this ANDROID
 patch.
 
+(cherry picked from commit a9dc703806031c8535c84c9905979f86dfaec1d3)
 Bug: 218934075
 Signed-off-by: Quentin Perret <qperret@google.com>
-Change-Id: I4a347908d189f2c4835fd576b26fae7c10ec9b22
 ---
- Android.bp                                    |  15 ++
- android/kselftest_test_list.mk                |   1 +
  .../selftests/kvm/aarch64/pvm_wipe_mem.c      | 174 ++++++++++++++++++
- 3 files changed, 190 insertions(+)
+ 1 file changed, 174 insertions(+)
  create mode 100644 tools/testing/selftests/kvm/aarch64/pvm_wipe_mem.c
 
-diff --git a/Android.bp b/Android.bp
-index 0b9166c56315..08805a161450 100644
---- a/Android.bp
-+++ b/Android.bp
-@@ -340,6 +340,21 @@ cc_test {
-     defaults: ["kselftest_defaults"],
- }
- 
-+// KVM test
-+cc_test {
-+    name: "kselftest_kvm_arm64_tests",
-+    relative_install_path: "linux-kselftest/kvm/aarch64",
-+    local_include_dirs: [ "tools/testing/selftests"],
-+    enabled: false,
-+    arch: {
-+        arm64: {
-+            enabled: true,
-+            srcs: ["tools/testing/selftests/kvm/aarch64/pvm_wipe_mem.c"],
-+        },
-+    },
-+    defaults: ["kselftest_defaults"],
-+}
-+
- // Lib test
- sh_test {
-     name: "kselftest_lib_printf",
-diff --git a/android/kselftest_test_list.mk b/android/kselftest_test_list.mk
-index 07df6fc5d758..46b9b92c58fb 100644
---- a/android/kselftest_test_list.mk
-+++ b/android/kselftest_test_list.mk
-@@ -31,6 +31,7 @@ kselftest_modules += \
-   kselftest_intel_pstate_tests_aperf \
-   kselftest_intel_pstate_tests_msr \
-   kselftest_kcmp_tests_kcmp_test \
-+  kselftest_kvm_arm64_tests_pvm_wipe_mem \
-   kselftest_net_tests_psock_tpacket \
-   kselftest_net_tests_socket \
-   kselftest_net_tests_reuseaddr_conflict \
 diff --git a/tools/testing/selftests/kvm/aarch64/pvm_wipe_mem.c b/tools/testing/selftests/kvm/aarch64/pvm_wipe_mem.c
 new file mode 100644
-index 000000000000..4af8ca3c4bad
+index 0000000000000..4af8ca3c4bad2
 --- /dev/null
 +++ b/tools/testing/selftests/kvm/aarch64/pvm_wipe_mem.c
 @@ -0,0 +1,174 @@
@@ -242,5 +203,5 @@ index 000000000000..4af8ca3c4bad
 +	ksft_exit_pass();
 +}
 -- 
-2.35.1.473.g83b2b277ed-goog
+2.36.0.550.gb090851708-goog
 

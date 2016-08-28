@@ -93,9 +93,11 @@ static char *huge_fd_off0;
 static unsigned long long *count_verify;
 static int uffd = -1;
 static int uffd_flags, finished, *pipefd;
+static volatile bool ready_for_fork;
 static char *area_src, *area_src_alias, *area_dst, *area_dst_alias;
 static char *zeropage;
 pthread_attr_t attr;
+pthread_key_t long_jmp_key;
 
 /* Userfaultfd test statistics */
 struct uffd_stats {
@@ -377,8 +379,13 @@ static void userfaultfd_open(uint64_t *features)
 	struct uffdio_api uffdio_api;
 
 	uffd = syscall(__NR_userfaultfd, O_CLOEXEC | O_NONBLOCK | UFFD_USER_MODE_ONLY);
-	if (uffd < 0)
-		err("userfaultfd syscall not available in this kernel");
+	if (uffd < 0) {
+		if (errno == ENOSYS) {
+			printf("userfaultfd syscall not available in this kernel\n");
+			exit(KSFT_SKIP);
+		}
+		err("userfaultfd syscall failed with errno: %d\n", errno);
+	}
 	uffd_flags = fcntl(uffd, F_GETFD, NULL);
 
 	uffdio_api.api = UFFD_API;
@@ -720,6 +727,9 @@ static void *uffd_poll_thread(void *arg)
 	pollfd[1].fd = pipefd[cpu*2];
 	pollfd[1].events = POLLIN;
 
+	// Notify the main thread that it can now fork.
+	ready_for_fork = true;
+
 	for (;;) {
 		ret = poll(pollfd, 2, -1);
 		if (ret <= 0) {
@@ -766,15 +776,28 @@ static void *uffd_poll_thread(void *arg)
 
 pthread_mutex_t uffd_read_mutex = PTHREAD_MUTEX_INITIALIZER;
 
+static void sigusr1_handler(int signum, siginfo_t *siginfo, void *ptr)
+{
+	jmp_buf *env;
+	env = pthread_getspecific(long_jmp_key);
+	longjmp(*env, 1);
+}
+
 static void *uffd_read_thread(void *arg)
 {
 	struct uffd_stats *stats = (struct uffd_stats *)arg;
 	struct uffd_msg msg;
+	jmp_buf env;
+	int setjmp_ret;
+
+	pthread_setspecific(long_jmp_key, &env);
 
 	pthread_mutex_unlock(&uffd_read_mutex);
-	/* from here cancellation is ok */
 
-	for (;;) {
+	// One first return setjmp return 0. On second (fake) return from
+	// longjmp() it returns the provided value, which will be 1 in our case.
+	setjmp_ret = setjmp(env);
+	while (!setjmp_ret) {
 		if (uffd_read_msg(uffd, &msg))
 			continue;
 		uffd_handle_page_fault(&msg, stats);
@@ -872,7 +895,7 @@ static int stress(struct uffd_stats *uffd_stats)
 					 (void *)&uffd_stats[cpu]))
 				return 1;
 		} else {
-			if (pthread_cancel(uffd_threads[cpu]))
+			if (pthread_kill(uffd_threads[cpu], SIGUSR1))
 				return 1;
 			if (pthread_join(uffd_threads[cpu], NULL))
 				return 1;
@@ -1112,6 +1135,10 @@ static int userfaultfd_events_test(void)
 	char c;
 	struct uffd_stats stats = { 0 };
 
+	// All the syscalls below up to pthread_create will ensure that this
+	// write is completed before, the uffd_thread sets it to true.
+	ready_for_fork = false;
+
 	printf("testing events (fork, remap, remove): ");
 	fflush(stdout);
 
@@ -1134,6 +1161,11 @@ static int userfaultfd_events_test(void)
 
 	if (pthread_create(&uffd_mon, &attr, uffd_poll_thread, &stats))
 		err("uffd_poll_thread create");
+
+	// Wait for the poll_thread to start executing before forking. This is
+	// required to avoid a deadlock, which can happen if poll_thread doesn't
+	// start getting executed by the time fork is invoked.
+	while (!ready_for_fork);
 
 	pid = fork();
 	if (pid < 0)
@@ -1165,6 +1197,10 @@ static int userfaultfd_sig_test(void)
 	char c;
 	struct uffd_stats stats = { 0 };
 
+	// All the syscalls below up to pthread_create will ensure that this
+	// write is completed before, the uffd_thread sets it to true.
+	ready_for_fork = false;
+
 	printf("testing signal delivery: ");
 	fflush(stdout);
 
@@ -1191,6 +1227,11 @@ static int userfaultfd_sig_test(void)
 
 	if (pthread_create(&uffd_mon, &attr, uffd_poll_thread, &stats))
 		err("uffd_poll_thread create");
+
+	// Wait for the poll_thread to start executing before forking. This is
+	// required to avoid a deadlock, which can happen if poll_thread doesn't
+	// start getting executed by the time fork is invoked.
+	while (!ready_for_fork);
 
 	pid = fork();
 	if (pid < 0)
@@ -1421,6 +1462,7 @@ static int userfaultfd_stress(void)
 	char *tmp_area;
 	unsigned long nr;
 	struct uffdio_register uffdio_register;
+	struct sigaction act;
 	struct uffd_stats uffd_stats[nr_cpus];
 
 	uffd_test_ctx_init(0);
@@ -1434,6 +1476,17 @@ static int userfaultfd_stress(void)
 
 	pthread_attr_init(&attr);
 	pthread_attr_setstacksize(&attr, 16*1024*1024);
+
+	// For handling thread termination of read thread in the absense of
+	// pthread_cancel().
+	pthread_key_create(&long_jmp_key, NULL);
+	memset(&act, 0, sizeof(act));
+	act.sa_sigaction = sigusr1_handler;
+	act.sa_flags = SA_SIGINFO;
+	if (sigaction(SIGUSR1, &act, 0)) {
+		perror("sigaction");
+		return 1;
+	}
 
 	while (bounces--) {
 		printf("bounces: %d, mode:", bounces);
@@ -1555,6 +1608,8 @@ static int userfaultfd_stress(void)
 		userfaultfd_pagemap_test(page_size * 512);
 	}
 
+	pthread_key_delete(long_jmp_key);
+
 	return userfaultfd_zeropage_test() || userfaultfd_sig_test()
 		|| userfaultfd_events_test() || userfaultfd_minor_test();
 }
@@ -1649,6 +1704,9 @@ static void sigalrm(int sig)
 
 int main(int argc, char **argv)
 {
+	char randstate[64];
+	unsigned int seed;
+
 	if (argc < 4)
 		usage();
 
@@ -1692,6 +1750,12 @@ int main(int argc, char **argv)
 			      nr_pages * page_size * 2))
 			err("fallocate");
 	}
+
+	seed = (unsigned int) time(NULL);
+	bzero(&randstate, sizeof(randstate));
+	if (!initstate(seed, randstate, sizeof(randstate)))
+		fprintf(stderr, "srandom_r error\n"), exit(1);
+
 	printf("nr_pages: %lu, nr_pages_per_cpu: %lu\n",
 	       nr_pages, nr_pages_per_cpu);
 	return userfaultfd_stress();

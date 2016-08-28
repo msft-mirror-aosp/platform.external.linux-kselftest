@@ -1,28 +1,25 @@
-From ea307c2e597a51f6cf60a786f2f2839413571e61 Mon Sep 17 00:00:00 2001
+From ad1e5a38525d1ceef1886061e6659501efc044fd Mon Sep 17 00:00:00 2001
 From: Steve Muckle <smuckle@google.com>
 Date: Mon, 9 Oct 2017 14:35:11 -0700
-Subject: [PATCH] selftests/exec: build exec kselftest for Android
+Subject: [PATCH 06/24] selftests/exec: build exec kselftest for Android
 
 The Makefile for the exec kselftest creates a script, symlink, copy of
 the binary, etc. Rather than have VTS copy all these items to the
 target, create a wrapper script to create these on the target. Note that
 the test also tries to access its Makefile.
 
+(cherry picked from commit ea307c2e597a51f6cf60a786f2f2839413571e61)
 Bug: 67016227
 Test: run vts-kernel -m VtsKernelLinuxKselftestStaging
-Change-Id: Ifba2670b11e3ba80050eb0c89c269e4da14bdd27
 Signed-off-by: Steve Muckle <smuckle@google.com>
 ---
-
- [smuckle@google.com: drop changes to Android-specific files for
-  tracking of changes to upstream]
-
-  tools/testing/selftests/exec/execveat.sh | 33 ++++++++++++++++++++++++++++++++
+ tools/testing/selftests/exec/execveat.sh | 33 ++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
  create mode 100755 tools/testing/selftests/exec/execveat.sh
 
 diff --git a/tools/testing/selftests/exec/execveat.sh b/tools/testing/selftests/exec/execveat.sh
 new file mode 100755
-index 000000000000..dc049eaef690
+index 0000000000000..dc049eaef6907
 --- /dev/null
 +++ b/tools/testing/selftests/exec/execveat.sh
 @@ -0,0 +1,33 @@
@@ -60,5 +57,5 @@ index 000000000000..dc049eaef690
 +chmod -x execveat.denatured && \
 +./execveat
 -- 
-2.16.0.rc1.238.g530d649a79-goog
+2.36.0.550.gb090851708-goog
 
