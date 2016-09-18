@@ -16,6 +16,9 @@
 
 include $(CLEAR_VARS)
 
+# Check if test supports target arch.
+ifneq (,$(findstring $(kselftest_target_arch), $(module_supported_arch)))
+
 module_name := kselftest_$(subst /,_,$(module_testname))
 module_stem := $(notdir $(module_testname))
 module_path := $(dir $(module_src_files))
@@ -29,7 +32,8 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_MULTILIB := both
 
 LOCAL_CFLAGS := $(kselftest_cflags) $(module_cflags)
-LOCAL_C_INCLUDES := $(addprefix $(kselftest_root)/$(kselftest_dir)/,$(module_c_includes))
+LOCAL_C_INCLUDES := $(kselftest_c_includes) \
+    $(addprefix $(kselftest_root)/$(kselftest_dir)/,$(module_c_includes))
 LOCAL_SRC_FILES := $(addprefix $(kselftest_dir)/,$(module_src_files))
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.test.mk
 
@@ -46,3 +50,5 @@ module_path :=
 vts_src_file_32 :=
 vts_src_file_64 :=
 vts_dst_dir :=
+
+endif

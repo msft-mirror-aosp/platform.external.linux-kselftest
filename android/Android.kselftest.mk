@@ -28,12 +28,14 @@ module_testname := efivarfs/open-unlink
 module_src_files := efivarfs/open-unlink.c
 module_cflags := -Wall
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := efivarfs/create-read
 module_src_files := efivarfs/create-read.c
 module_cflags := -Wall
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 # Firmware test
@@ -87,37 +89,62 @@ module_testname := futex/functional/futex_wait_timeout
 module_src_files := futex/functional/futex_wait_timeout.c
 module_cflags := -g -O2 -Wall -D_GNU_SOURCE -pthread -pthread -lrt
 module_c_includes := futex/include .
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := futex/functional/futex_wait_wouldblock
 module_src_files := futex/functional/futex_wait_wouldblock.c
 module_cflags := -g -O2 -Wall -D_GNU_SOURCE -pthread -pthread -lrt
 module_c_includes := futex/include .
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := futex/functional/futex_requeue_pi_mismatched_ops
 module_src_files := futex/functional/futex_requeue_pi_mismatched_ops.c
 module_cflags := -g -O2 -Wall -D_GNU_SOURCE -pthread -pthread -lrt
 module_c_includes := futex/include .
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := futex/functional/futex_wait_uninitialized_heap
 module_src_files := futex/functional/futex_wait_uninitialized_heap.c
 module_cflags := -g -O2 -Wall -D_GNU_SOURCE -pthread -pthread -lrt
 module_c_includes := futex/include .
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := futex/functional/futex_wait_private_mapped_file
 module_src_files := futex/functional/futex_wait_private_mapped_file.c
 module_cflags := -g -O2 -Wall -D_GNU_SOURCE -pthread -pthread -lrt
 module_c_includes := futex/include .
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
+
+# intel_pstate test
+module_testname := intel_pstate/aperf
+module_src_files := intel_pstate/aperf.c
+module_cflags := -Wall -D_GNU_SOURCE -lm
+module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
+include $(build_kselftest_test)
+
+module_testname := intel_pstate/msr
+module_src_files := intel_pstate/msr.c
+module_cflags := -Wall -D_GNU_SOURCE -lm
+module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
+include $(build_kselftest_test)
+
+module_prebuilt := intel_pstate/run.sh
+module_src_files := intel_pstate/run.sh
+include $(build_kselftest_prebuilt)
 
 # Kcmp test
 module_testname := kcmp/kcmp_test
 module_src_files := kcmp/kcmp_test.c
 module_cflags :=
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 # Lib test
@@ -129,11 +156,34 @@ module_prebuilt := lib/bitmap
 module_src_files := lib/bitmap.sh
 include $(build_kselftest_prebuilt)
 
+# media_tests test
+module_testname := media_tests/media_device_test
+module_src_files := media_tests/media_device_test.c
+module_cflags :=
+module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
+include $(build_kselftest_test)
+
+module_testname := media_tests/media_device_open
+module_src_files := media_tests/media_device_open.c
+module_cflags :=
+module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
+include $(build_kselftest_test)
+
+module_testname := media_tests/video_device_test
+module_src_files := media_tests/video_device_test.c
+module_cflags :=
+module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
+include $(build_kselftest_test)
+
 # Membarrier test
 module_testname := membarrier/membarrier_test
 module_src_files := membarrier/membarrier_test.c
 module_cflags :=
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 # Memory-hotplug test
@@ -146,6 +196,7 @@ module_testname := mount/unprivileged-remount-test
 module_src_files := mount/unprivileged-remount-test.c
 module_cflags := -Wall -O2
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 # Net test
@@ -157,25 +208,34 @@ module_testname := net/socket
 module_src_files := net/socket.c
 module_cflags := -Wall -O2 -g
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := net/psock_fanout
 module_src_files := net/psock_fanout.c
 module_cflags := -Wall -O2 -g
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := net/psock_tpacket
 module_src_files := net/psock_tpacket.c
 module_cflags := -Wall -O2 -g
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := net/reuseport_dualstack
 module_src_files := net/reuseport_dualstack.c
 module_cflags := -Wall -O2 -g
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
+
+# ntb tests
+module_prebuilt := ntb/ntb_test.sh
+module_src_files := ntb/ntb_test.sh
+include $(build_kselftest_prebuilt)
 
 # Pstore test
 module_prebuilt := pstore/pstore_tests
@@ -199,6 +259,15 @@ module_testname := ptrace/peeksiginfo
 module_src_files := ptrace/peeksiginfo.c
 module_cflags := -Wall
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
+include $(build_kselftest_test)
+
+# seccomp test
+module_testname := seccomp/seccomp_bpf
+module_src_files := seccomp/seccomp_bpf.c
+module_cflags := -Wl,-no-as-needed -Wall -lpthread
+module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 # Static keys test
@@ -224,114 +293,133 @@ module_testname := timers/posix_timers
 module_src_files := timers/posix_timers.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := timers/nanosleep
 module_src_files := timers/nanosleep.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := timers/nsleep-lat
 module_src_files := timers/nsleep-lat.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := timers/set-timer-lat
 module_src_files := timers/set-timer-lat.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := timers/inconsistency-check
 module_src_files := timers/inconsistency-check.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := timers/raw_skew
 module_src_files := timers/raw_skew.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := timers/threadtest
 module_src_files := timers/threadtest.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := timers/rtctest
 module_src_files := timers/rtctest.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := timers/alarmtimer-suspend
 module_src_files := timers/alarmtimer-suspend.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := timers/valid-adjtimex
 module_src_files := timers/valid-adjtimex.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := timers/adjtick
 module_src_files := timers/adjtick.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := timers/change_skew
 module_src_files := timers/change_skew.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := timers/skew_consistency
 module_src_files := timers/skew_consistency.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := timers/clocksource-switch
 module_src_files := timers/clocksource-switch.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := timers/leap-a-day
 module_src_files := timers/leap-a-day.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := timers/leapcrash
 module_src_files := timers/leapcrash.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := timers/set-tai
 module_src_files := timers/set-tai.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := timers/set-2038
 module_src_files := timers/set-2038.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := timers/set-tz
 module_src_files := timers/set-tz.c
 module_cflags := -O3 -Wl,-no-as-needed -Wall -DKTEST  -lrt -lpthread
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 # User test
@@ -344,41 +432,65 @@ module_testname := vm/compaction_test
 module_src_files := vm/compaction_test.c
 module_cflags := -Wall -lrt
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := vm/hugepage-mmap
 module_src_files := vm/hugepage-mmap.c
 module_cflags := -Wall -lrt
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := vm/hugepage-shm
 module_src_files := vm/hugepage-shm.c
 module_cflags := -Wall -lrt
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := vm/map_hugetlb
 module_src_files := vm/map_hugetlb.c
 module_cflags := -Wall -lrt
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := vm/mlock2-tests
 module_src_files := vm/mlock2-tests.c
 module_cflags := -Wall -lrt
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := vm/on-fault-limit
 module_src_files := vm/on-fault-limit.c
 module_cflags := -Wall -lrt
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
 
 module_testname := vm/transhuge-stress
 module_src_files := vm/transhuge-stress.c
 module_cflags := -Wall -lrt
 module_c_includes :=
+module_supported_arch := arm arm64 x86 x86_64
 include $(build_kselftest_test)
+
+# zram tests
+module_prebuilt := zram/zram.sh
+module_src_files := zram/zram.sh
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := zram/zram01.sh
+module_src_files := zram/zram01.sh
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := zram/zram02.sh
+module_src_files := zram/zram02.sh
+include $(build_kselftest_prebuilt)
+
+module_prebuilt := zram/zram_lib.sh
+module_src_files := zram/zram_lib.sh
+include $(build_kselftest_prebuilt)
 

@@ -39,8 +39,16 @@ LOCAL_PATH := $(call my-dir)
 kselftest_root := $(LOCAL_PATH)
 kselftest_dir := tools/testing/selftests
 
+kselftest_target_arch = $(TARGET_ARCH)
+
 include $(CLEAR_VARS)
+
+# Hacks for bionic compatibility
 kselftest_cflags := \
+    -include $(kselftest_root)/android/include/bionic-compat.h
+
+# Silence noisy warnings
+kselftest_cflags += \
     -Wno-deprecated \
     -Wno-format \
     -Wno-gnu-designator \
@@ -56,7 +64,12 @@ kselftest_cflags := \
     -Wno-non-literal-null-conversion \
     -Wno-unused-variable \
     -Wno-unused-parameter \
+    -Wno-empty-body \
+    -Wno-literal-conversion \
     -Werror \
+
+kselftest_c_includes := \
+  $(kselftest_root)/android/include \
 
 build_kselftest_test := $(kselftest_root)/android/Android.test.mk
 build_kselftest_prebuilt := $(kselftest_root)/android/Android.prebuilt.mk
