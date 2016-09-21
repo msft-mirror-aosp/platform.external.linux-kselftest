@@ -595,6 +595,7 @@ TEST(ERRNO_zero)
 	EXPECT_EQ(0, read(0, NULL, 0));
 }
 
+#ifndef __ANDROID__
 TEST(ERRNO_capped)
 {
 	struct sock_filter filter[] = {
@@ -621,6 +622,7 @@ TEST(ERRNO_capped)
 	EXPECT_EQ(-1, read(0, NULL, 0));
 	EXPECT_EQ(4095, errno);
 }
+#endif
 
 FIXTURE_DATA(TRAP) {
 	struct sock_fprog prog;
@@ -1530,6 +1532,7 @@ TEST_F(TRACE_syscall, syscall_dropped)
 	EXPECT_NE(self->mytid, syscall(__NR_gettid));
 }
 
+#ifndef __ANDROID__
 TEST_F(TRACE_syscall, skip_after_RET_TRACE)
 {
 	struct sock_filter filter[] = {
@@ -1653,6 +1656,7 @@ TEST_F_SIGNAL(TRACE_syscall, kill_after_ptrace, SIGSYS)
 	/* Tracer will redirect getpid to getppid, and we should die. */
 	EXPECT_NE(self->mypid, syscall(__NR_getpid));
 }
+#endif
 
 #ifndef __NR_seccomp
 # if defined(__i386__)
@@ -2235,6 +2239,7 @@ TEST_F(TSYNC, two_siblings_not_under_filter)
 	ASSERT_EQ(0, ret);  /* just us chickens */
 }
 
+#ifndef __ANDROID__
 /* Make sure restarted syscalls are seen directly as "restart_syscall". */
 TEST(syscall_restart)
 {
@@ -2403,6 +2408,7 @@ TEST(syscall_restart)
 	if (WIFSIGNALED(status) || WEXITSTATUS(status))
 		_metadata->passed = 0;
 }
+#endif
 
 /*
  * TODO:
