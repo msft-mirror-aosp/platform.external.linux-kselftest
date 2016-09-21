@@ -21,7 +21,7 @@ ifneq (,$(findstring $(kselftest_target_arch), $(module_supported_arch)))
 
 module_name := kselftest_$(subst /,_,$(module_testname))
 module_stem := $(notdir $(module_testname))
-module_path := $(dir $(module_src_files))
+module_path := $(dir $(module_testname))
 
 LOCAL_MODULE := $(module_name)
 LOCAL_MODULE_STEM_32 := $(module_stem)

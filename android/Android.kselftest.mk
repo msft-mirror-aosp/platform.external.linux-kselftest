@@ -14,6 +14,21 @@
 # limitations under the License.
 #
 
+# breakpoints test
+module_testname := breakpoints/breakpoint_test
+module_src_files := breakpoints/breakpoint_test.c
+module_cflags :=
+module_c_includes :=
+module_supported_arch := x86 x86_64
+include $(build_kselftest_test)
+
+module_testname := breakpoints/step_after_suspend_test
+module_src_files := breakpoints/step_after_suspend_test.c
+module_cflags :=
+module_c_includes :=
+module_supported_arch := x86 x86_64
+include $(build_kselftest_test)
+
 # Cpu-hotplug test
 module_prebuilt := cpu-hotplug/cpu-on-off-test
 module_src_files := cpu-hotplug/cpu-on-off-test.sh
@@ -475,6 +490,112 @@ module_src_files := vm/transhuge-stress.c
 module_cflags := -Wall -lrt
 module_c_includes :=
 module_supported_arch := arm arm64 x86 x86_64
+include $(build_kselftest_test)
+
+# x86 test
+module_testname := x86/single_step_syscall
+module_src_files := x86/single_step_syscall.c
+module_cflags := -O2 -g -std=gnu99 -pthread -Wall -lrt -ldl -lm
+module_c_includes :=
+module_supported_arch := x86 x86_64
+include $(build_kselftest_test)
+
+module_testname := x86/sysret_ss_attrs
+module_src_files := x86/sysret_ss_attrs.c
+module_cflags := -O2 -g -std=gnu99 -pthread -Wall -lrt -ldl -lm
+module_c_includes :=
+module_supported_arch := x86
+include $(build_kselftest_test)
+
+module_testname := x86/syscall_nt
+module_src_files := x86/syscall_nt.c
+module_cflags := -O2 -g -std=gnu99 -pthread -Wall -lrt -ldl -lm
+module_c_includes :=
+module_supported_arch := x86 x86_64
+include $(build_kselftest_test)
+
+module_testname := x86/ptrace_syscall
+module_src_files := x86/ptrace_syscall.c x86/raw_syscall_helper_32.S
+module_cflags := -O2 -g -std=gnu99 -pthread -Wall -lrt -ldl -lm
+module_c_includes :=
+module_supported_arch := x86 x86_64
+include $(build_kselftest_test)
+
+module_testname := x86/test_mremap_vdso
+module_src_files := x86/test_mremap_vdso.c
+module_cflags := -O2 -g -std=gnu99 -pthread -Wall -lrt -ldl -lm
+module_c_includes :=
+module_supported_arch := x86 x86_64
+include $(build_kselftest_test)
+
+module_testname := x86/check_initial_reg_state
+module_src_files := x86/check_initial_reg_state.c
+module_cflags := -O2 -g -std=gnu99 -pthread -Wall -Wl,-ereal_start -static -lrt -ldl -lm
+module_c_includes :=
+module_supported_arch := x86 x86_64
+include $(build_kselftest_test)
+
+module_testname := x86/ldt_gdt
+module_src_files := x86/ldt_gdt.c
+module_cflags := -O2 -g -std=gnu99 -pthread -Wall -lrt -ldl -lm
+module_c_includes :=
+module_supported_arch := x86 x86_64
+include $(build_kselftest_test)
+
+module_testname := x86/entry_from_vm86
+module_src_files := x86/entry_from_vm86.c
+module_cflags := -O2 -g -std=gnu99 -pthread -Wall -lrt -ldl -lm
+module_c_includes :=
+module_supported_arch := x86
+#include $(build_kselftest_test)
+
+module_testname := x86/syscall_arg_fault
+module_src_files := x86/syscall_arg_fault.c
+module_cflags := -O2 -g -std=gnu99 -pthread -lrt -ldl -lm
+module_c_includes :=
+module_supported_arch := x86
+include $(build_kselftest_test)
+
+module_testname := x86/test_syscall_vdso
+module_src_files := x86/test_syscall_vdso.c x86/thunks_32.S
+module_cflags := -O2 -g -std=gnu99 -pthread -Wall -lrt -ldl -lm
+module_c_includes :=
+module_supported_arch := x86
+include $(build_kselftest_test)
+
+module_testname := x86/unwind_vdso
+module_src_files := x86/unwind_vdso.c
+module_cflags := -O2 -g -std=gnu99 -pthread -Wall -lrt -ldl -lm
+module_c_includes :=
+module_supported_arch := x86
+include $(build_kselftest_test)
+
+module_testname := x86/test_FCMOV
+module_src_files := x86/test_FCMOV.c
+module_cflags := -O2 -g -std=gnu99 -pthread -Wall -lrt -ldl -lm
+module_c_includes :=
+module_supported_arch := x86
+include $(build_kselftest_test)
+
+module_testname := x86/test_FCOMI
+module_src_files := x86/test_FCOMI.c
+module_cflags := -O2 -g -std=gnu99 -pthread -Wall -lrt -ldl -lm
+module_c_includes :=
+module_supported_arch := x86
+include $(build_kselftest_test)
+
+module_testname := x86/test_FISTTP
+module_src_files := x86/test_FISTTP.c
+module_cflags := -O2 -g -std=gnu99 -pthread -Wall -lrt -ldl -lm
+module_c_includes :=
+module_supported_arch := x86
+include $(build_kselftest_test)
+
+module_testname := x86/vdso_restorer
+module_src_files := x86/vdso_restorer.c
+module_cflags := -O2 -g -std=gnu99 -pthread -Wall -lrt -ldl -lm
+module_c_includes :=
+module_supported_arch := x86
 include $(build_kselftest_test)
 
 # zram tests
