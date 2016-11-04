@@ -17,7 +17,7 @@
 disabled_target := 0
 
 # TODO(trong): enable kselftest for darwin and windows hosts.
-ifneq (linux, $(HOST_OS)
+ifneq (linux, $(HOST_OS))
 disabled_target := 1
 endif
 
