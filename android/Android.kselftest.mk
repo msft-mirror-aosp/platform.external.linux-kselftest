@@ -514,15 +514,12 @@ module_c_includes :=
 module_supported_arch := x86 x86_64
 include $(build_kselftest_test)
 
-# TODO(trong, yim): b/30713453
-ifneq (x86_64, $(TARGET_ARCH))
 module_testname := x86/ptrace_syscall
 module_src_files := x86/ptrace_syscall.c x86/raw_syscall_helper_32.S
 module_cflags := -O2 -g -std=gnu99 -pthread -Wall -lrt -ldl -lm
 module_c_includes :=
-module_supported_arch := x86 x86_64
+module_supported_arch := x86
 include $(build_kselftest_test)
-endif
 
 module_testname := x86/test_mremap_vdso
 module_src_files := x86/test_mremap_vdso.c
