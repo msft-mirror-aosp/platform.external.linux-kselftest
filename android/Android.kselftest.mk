@@ -29,21 +29,6 @@ module_c_includes :=
 module_supported_arch := x86 x86_64
 include $(build_kselftest_test)
 
-# Capabilities test
-module_testname := capabilities/test_execve
-module_src_files := capabilities/test_execve.c
-module_cflags :=
-module_c_includes :=
-module_supported_arch := arm arm64
-include $(build_kselftest_test)
-
-module_testname := capabilities/validate_cap
-module_src_files := capabilities/validate_cap.c
-module_cflags :=
-module_c_includes :=
-module_supported_arch := arm arm64
-include $(build_kselftest_test)
-
 # Cpu-hotplug test
 module_prebuilt := cpu-hotplug/cpu-on-off-test
 module_src_files := cpu-hotplug/cpu-on-off-test.sh
