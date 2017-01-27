@@ -33,12 +33,7 @@ LOCAL_MULTILIB := both
 
 LOCAL_CFLAGS := $(kselftest_cflags) $(module_cflags)
 LOCAL_C_INCLUDES := $(kselftest_c_includes) \
-    $(addprefix $(kselftest_root)/$(kselftest_dir)/,$(module_c_includes)) \
-    external/libcap-ng/libcap-ng-0.7/src \
-
-LOCAL_SHARED_LIBRARIES := \
-    libcap-ng \
-
+    $(addprefix $(kselftest_root)/$(kselftest_dir)/,$(module_c_includes))
 LOCAL_SRC_FILES := $(addprefix $(kselftest_dir)/,$(module_src_files))
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.test.mk
 
