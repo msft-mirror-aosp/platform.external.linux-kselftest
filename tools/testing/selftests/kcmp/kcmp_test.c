@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 		int pid2 = getpid();
 		int ret;
 
-		fd2 = open(kpath, O_RDWR, 0644);
+		fd2 = open(kpath, O_RDWR);
 		if (fd2 < 0) {
 			perror("Can't open file");
 			ksft_exit_fail();
