@@ -123,19 +123,6 @@ module_prebuilt := static_keys/test_static_keys
 module_src_files := static_keys/test_static_keys.sh
 include $(build_kselftest_prebuilt)
 
-# Sysctl
-module_prebuilt := sysctl/run_numerictests
-module_src_files := sysctl/run_numerictests
-include $(build_kselftest_prebuilt)
-
-module_prebuilt := sysctl/run_stringtests
-module_src_files := sysctl/run_stringtests
-include $(build_kselftest_prebuilt)
-
-module_prebuilt := sysctl/common_tests
-module_src_files := sysctl/common_tests
-include $(build_kselftest_prebuilt)
-
 # User test
 module_prebuilt := user/test_user_copy
 module_src_files := user/test_user_copy.sh
