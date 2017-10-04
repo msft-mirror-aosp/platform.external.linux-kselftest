@@ -36,6 +36,7 @@ kselftest_modules := \
 # From Android.bp
 kselftest_modules += \
   kselftest_breakpoints_tests_breakpoint_test \
+  kselftest_breakpoints_tests_breakpoint_test_arm64 \
   kselftest_breakpoints_tests_step_after_suspend_test \
   kselftest_efivarfs_tests_create-read \
   kselftest_efivarfs_tests_open-unlink \
