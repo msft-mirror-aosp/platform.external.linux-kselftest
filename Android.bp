@@ -107,6 +107,16 @@ cc_test {
     // TODO: test_data: efivarfs/efivarfs.sh
 }
 
+// Exec test
+cc_test {
+    name: "kselftest_exec_test",
+    relative_install_path: "linux-kselftest/exec",
+    srcs: [
+        "tools/testing/selftests/exec/execveat.c",
+    ],
+    defaults: ["kselftest_defaults"],
+}
+
 // Futex test
 cc_test {
     name: "kselftest_futex_tests",
