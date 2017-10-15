@@ -38,6 +38,8 @@ kselftest_modules += \
   kselftest_breakpoints_tests_breakpoint_test \
   kselftest_breakpoints_tests_breakpoint_test_arm64 \
   kselftest_breakpoints_tests_step_after_suspend_test \
+  kselftest_capabilities_test_test_execve \
+  kselftest_capabilities_test_validate_cap \
   kselftest_efivarfs_tests_create-read \
   kselftest_efivarfs_tests_open-unlink \
   kselftest_futex_tests_futex_requeue_pi_mismatched_ops \
