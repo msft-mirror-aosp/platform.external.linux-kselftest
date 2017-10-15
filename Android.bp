@@ -83,6 +83,18 @@ cc_test {
     },
 }
 
+// capabilities test
+cc_test {
+    name: "kselftest_capabilities_test",
+    relative_install_path: "linux-kselftest/capabilities",
+    srcs: [
+        "tools/testing/selftests/capabilities/test_execve.c",
+        "tools/testing/selftests/capabilities/validate_cap.c",
+    ],
+    defaults: ["kselftest_defaults"],
+    static_libs: ["libcap-ng"],
+}
+
 // Efivarfs test
 cc_test {
     name: "kselftest_efivarfs_tests",
