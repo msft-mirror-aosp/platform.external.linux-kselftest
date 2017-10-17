@@ -24,6 +24,11 @@ module_prebuilt := efivarfs/efivarfs
 module_src_files := efivarfs/efivarfs.sh
 include $(build_kselftest_prebuilt)
 
+# Exec test
+module_prebuilt := exec/execveat.sh
+module_src_files := exec/execveat.sh
+include $(build_kselftest_prebuilt)
+
 # Firmware test
 
 module_prebuilt := firmware/fw_fallback
