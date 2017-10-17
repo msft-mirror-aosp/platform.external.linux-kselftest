@@ -372,7 +372,7 @@ static int run_tests(void)
 static void prerequisites(void)
 {
 	int fd;
-	const char *script = "#!/bin/sh\nexit $*\n";
+	const char *script = "#!/system/bin/sh\nexit $*\n";
 
 	/* Create ephemeral copies of files */
 	exe_cp("execveat", "execveat.ephemeral");
