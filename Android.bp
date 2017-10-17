@@ -104,7 +104,6 @@ cc_test {
         "tools/testing/selftests/efivarfs/create-read.c",
     ],
     defaults: ["kselftest_defaults"],
-    // TODO: test_data: efivarfs/efivarfs.sh
 }
 
 // Exec test
