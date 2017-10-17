@@ -3,8 +3,6 @@ kselftest_modules := \
   kselftest_cpu-hotplug_cpu-on-off-test \
   kselftest_efivarfs_efivarfs \
   kselftest_exec_execveat.sh \
-  kselftest_firmware_fw_filesystem \
-  kselftest_firmware_fw_userhelper \
   kselftest_ftrace_ftracetest \
   kselftest_ftrace_test.d_functions \
   kselftest_ftrace_test.d_00basic_basic2 \
