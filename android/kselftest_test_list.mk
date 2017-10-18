@@ -2,8 +2,7 @@
 kselftest_modules := \
   kselftest_cpu-hotplug_cpu-on-off-test \
   kselftest_efivarfs_efivarfs \
-  kselftest_firmware_fw_filesystem \
-  kselftest_firmware_fw_userhelper \
+  kselftest_exec_execveat.sh \
   kselftest_ftrace_ftracetest \
   kselftest_ftrace_test.d_functions \
   kselftest_ftrace_test.d_00basic_basic2 \
@@ -42,6 +41,7 @@ kselftest_modules += \
   kselftest_capabilities_test_validate_cap \
   kselftest_efivarfs_tests_create-read \
   kselftest_efivarfs_tests_open-unlink \
+  kselftest_exec_test_execveat \
   kselftest_futex_tests_futex_requeue_pi_mismatched_ops \
   kselftest_futex_tests_futex_wait_private_mapped_file \
   kselftest_futex_tests_futex_wait_timeout \

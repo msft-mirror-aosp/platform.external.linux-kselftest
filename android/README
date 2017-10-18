@@ -3,3 +3,7 @@
 ### filesystems/dnotify_test.c
 
 This test has an endless loop in it. It is not currently run as part of the kselftest suite.
+
+### firmware/
+
+These tests depend on a kernel module enabled by CONFIG_TEST_FIRMWARE, which is not required.
