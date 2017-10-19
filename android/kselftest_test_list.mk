@@ -3,15 +3,6 @@ kselftest_modules := \
   kselftest_cpu-hotplug_cpu-on-off-test \
   kselftest_efivarfs_efivarfs \
   kselftest_exec_execveat.sh \
-  kselftest_ftrace_ftracetest \
-  kselftest_ftrace_test.d_functions \
-  kselftest_ftrace_test.d_00basic_basic2 \
-  kselftest_ftrace_test.d_00basic_basic4 \
-  kselftest_ftrace_test.d_00basic_basic1 \
-  kselftest_ftrace_test.d_00basic_basic3 \
-  kselftest_ftrace_test.d_template \
-  kselftest_ftrace_test.d_instances_instance \
-  kselftest_ftrace_test.d_instances_instance-event \
   kselftest_intel_pstate_run.sh \
   kselftest_lib_printf \
   kselftest_lib_bitmap \
