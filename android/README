@@ -2,12 +2,24 @@
 
 ### filesystems/dnotify_test.c
 
-This test has an endless loop in it. It is not currently run as part of the kselftest suite.
+This test has an endless loop in it. It is not currently run as part of the
+kselftest suite.
 
 ### firmware/
 
-These tests depend on a kernel module enabled by CONFIG_TEST_FIRMWARE, which is not required.
+These tests depend on a kernel module enabled by CONFIG_TEST_FIRMWARE, which is
+not required by Android.
 
 ### ftrace/
 
 Ftrace is a debug feature and not required by Android.
+
+### gpio/
+
+The gpio test requires a test kernel module and gpiolib, neither of which are
+required by Android.
+
+### ipc/
+
+The ipc test requires CONFIG_EXPERT and CONFIG_CHECKPOINT_RESTORE be enabled,
+neither of which are required by Android.
