@@ -23,3 +23,9 @@ required by Android.
 
 The ipc test requires CONFIG_EXPERT and CONFIG_CHECKPOINT_RESTORE be enabled,
 neither of which are required by Android.
+
+### media_tests/
+
+The media_tests depend on /dev/mediaX and /dev/videoX files which may not be
+present. They also require manual inspection of dmesg and are not part of
+the normal kselftest suite.
