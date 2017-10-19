@@ -41,9 +41,6 @@ kselftest_modules += \
   kselftest_intel_pstate_tests_aperf \
   kselftest_intel_pstate_tests_msr \
   kselftest_kcmp_tests_kcmp_test \
-  kselftest_media_tests_media_device_open \
-  kselftest_media_tests_media_device_test \
-  kselftest_media_tests_video_device_test \
   kselftest_membarrier_tests_membarrier_test \
   kselftest_mount_tests_unprivileged-remount-test \
   kselftest_net_tests_psock_fanout \
