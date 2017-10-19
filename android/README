@@ -34,3 +34,7 @@ the normal kselftest suite.
 
 The membarrier test depends on CONFIG_EXPERT and CONFIG_MEMBARRIER being
 enabled, neither of which are required by Android.
+
+### memfd/
+
+These tests depend on FUSE which is not present in Android.
