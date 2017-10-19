@@ -40,7 +40,6 @@ kselftest_modules += \
   kselftest_intel_pstate_tests_aperf \
   kselftest_intel_pstate_tests_msr \
   kselftest_kcmp_tests_kcmp_test \
-  kselftest_mount_tests_unprivileged-remount-test \
   kselftest_net_tests_psock_fanout \
   kselftest_net_tests_psock_tpacket \
   kselftest_net_tests_reuseport_dualstack \

@@ -42,3 +42,7 @@ These tests depend on FUSE which is not present in Android.
 ### memory-hotplug/
 
 Memory hotplug is not required by Android.
+
+### mount/
+
+The mount test depends on CONFIG_USER_NS which is not required by Android.
