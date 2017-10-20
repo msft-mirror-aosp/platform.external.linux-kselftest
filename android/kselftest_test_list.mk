@@ -6,7 +6,6 @@ kselftest_modules := \
   kselftest_intel_pstate_run.sh \
   kselftest_lib_printf \
   kselftest_lib_bitmap \
-  kselftest_net_test_bpf \
   kselftest_ntb_ntb_test.sh \
   kselftest_pstore_pstore_tests \
   kselftest_pstore_pstore_post_reboot_tests \
@@ -40,9 +39,7 @@ kselftest_modules += \
   kselftest_intel_pstate_tests_aperf \
   kselftest_intel_pstate_tests_msr \
   kselftest_kcmp_tests_kcmp_test \
-  kselftest_net_tests_psock_fanout \
   kselftest_net_tests_psock_tpacket \
-  kselftest_net_tests_reuseport_dualstack \
   kselftest_net_tests_socket \
   kselftest_ptrace_tests_peeksiginfo \
   kselftest_seccomp_tests_seccomp_bpf \
