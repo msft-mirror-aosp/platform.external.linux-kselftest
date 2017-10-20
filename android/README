@@ -50,3 +50,10 @@ The mount test depends on CONFIG_USER_NS which is not required by Android.
 ### mqueue/
 
 These tests depend on -lrt and -lpopt which are not present in Android.
+
+### net/
+
+The test_bpf.sh test requires a kernel module enabled by CONFIG_TEST_BPF.
+The netdevice.sh test operates on an ethernet interface.
+The psock_fanout test depends on CONFIG_BPF_SYSCALL which is not required on
+Android.
