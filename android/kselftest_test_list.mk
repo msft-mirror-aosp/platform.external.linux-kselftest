@@ -6,7 +6,6 @@ kselftest_modules := \
   kselftest_intel_pstate_run.sh \
   kselftest_lib_printf \
   kselftest_lib_bitmap \
-  kselftest_memory-hotplug_mem-on-off-test \
   kselftest_net_test_bpf \
   kselftest_ntb_ntb_test.sh \
   kselftest_pstore_pstore_tests \

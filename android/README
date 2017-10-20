@@ -38,3 +38,7 @@ enabled, neither of which are required by Android.
 ### memfd/
 
 These tests depend on FUSE which is not present in Android.
+
+### memory-hotplug/
+
+Memory hotplug is not required by Android.
