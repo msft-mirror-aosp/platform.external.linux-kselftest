@@ -46,3 +46,7 @@ Memory hotplug is not required by Android.
 ### mount/
 
 The mount test depends on CONFIG_USER_NS which is not required by Android.
+
+### mqueue/
+
+These tests depend on -lrt and -lpopt which are not present in Android.
