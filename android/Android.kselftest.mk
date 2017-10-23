@@ -100,11 +100,6 @@ module_prebuilt := net/test_bpf
 module_src_files := net/test_bpf.sh
 include $(build_kselftest_prebuilt)
 
-# ntb tests
-module_prebuilt := ntb/ntb_test.sh
-module_src_files := ntb/ntb_test.sh
-include $(build_kselftest_prebuilt)
-
 # Pstore test
 module_prebuilt := pstore/pstore_tests
 module_src_files := pstore/pstore_tests

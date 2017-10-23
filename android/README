@@ -62,3 +62,7 @@ Android.
 
 These tests depend on CONFIG_USER_NS and CONFIG_PID_NS, neither of which are
 required by Android.
+
+### ntb/
+
+NTB (non-transparent bridge) is not required by Android.
