@@ -6,6 +6,7 @@ kselftest_modules := \
   kselftest_intel_pstate_run.sh \
   kselftest_lib_printf \
   kselftest_lib_bitmap \
+  kselftest_splice_default_file_splice_read.sh \
   kselftest_static_keys_test_static_keys \
   kselftest_sysctl_run_numerictests \
   kselftest_sysctl_run_stringtests \
@@ -39,6 +40,7 @@ kselftest_modules += \
   kselftest_ptrace_tests_peeksiginfo \
   kselftest_seccomp_tests_seccomp_bpf \
   kselftest_size_test_get_size \
+  kselftest_splice_test_default_file_splice_read \
   kselftest_timer_tests_adjtick \
   kselftest_timer_tests_alarmtimer-suspend \
   kselftest_timer_tests_change_skew \
