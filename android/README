@@ -83,3 +83,7 @@ This is a test for functionality that is not available in bionic (swapcontext())
 
 This test depends on a kernel module enabled by CONFIG_TEST_STATIC_KEYS. This
 kernel module is not required by Android.
+
+### sync/
+
+These tests verify the legacy sync API which is deprecated on Android.
