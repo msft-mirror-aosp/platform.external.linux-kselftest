@@ -37,23 +37,15 @@ kselftest_modules += \
   kselftest_seccomp_tests_seccomp_bpf \
   kselftest_size_test_get_size \
   kselftest_splice_test_default_file_splice_read \
-  kselftest_timer_tests_adjtick \
   kselftest_timer_tests_alarmtimer-suspend \
-  kselftest_timer_tests_change_skew \
-  kselftest_timer_tests_clocksource-switch \
   kselftest_timer_tests_inconsistency-check \
-  kselftest_timer_tests_leap-a-day \
-  kselftest_timer_tests_leapcrash \
   kselftest_timer_tests_nanosleep \
   kselftest_timer_tests_nsleep-lat \
   kselftest_timer_tests_posix_timers \
   kselftest_timer_tests_raw_skew \
   kselftest_timer_tests_rtctest \
-  kselftest_timer_tests_set-2038 \
   kselftest_timer_tests_set-tai \
   kselftest_timer_tests_set-timer-lat \
-  kselftest_timer_tests_set-tz \
-  kselftest_timer_tests_skew_consistency \
   kselftest_timer_tests_threadtest \
   kselftest_timer_tests_valid-adjtimex \
   kselftest_vm_tests_compaction_test \
