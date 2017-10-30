@@ -57,3 +57,8 @@ The test_bpf.sh test requires a kernel module enabled by CONFIG_TEST_BPF.
 The netdevice.sh test operates on an ethernet interface.
 The psock_fanout test depends on CONFIG_BPF_SYSCALL which is not required on
 Android.
+
+### nsfs/
+
+These tests depend on CONFIG_USER_NS and CONFIG_PID_NS, neither of which are
+required by Android.
