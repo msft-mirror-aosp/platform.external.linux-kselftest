@@ -70,3 +70,7 @@ NTB (non-transparent bridge) is not required by Android.
 ### pstore/
 
 Pstore is recommended, not required, for Android.
+
+### ptp/
+
+PTP support is not required by Android.
