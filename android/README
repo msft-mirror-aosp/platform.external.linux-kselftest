@@ -66,3 +66,7 @@ required by Android.
 ### ntb/
 
 NTB (non-transparent bridge) is not required by Android.
+
+### pstore/
+
+Pstore is recommended, not required, for Android.
