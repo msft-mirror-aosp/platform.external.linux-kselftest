@@ -1530,6 +1530,11 @@ TEST_F(TRACE_syscall, syscall_dropped)
 	EXPECT_NE(self->mytid, syscall(__NR_gettid));
 }
 
+/*
+ * TODO: b/33027081
+ * These tests do not work on kernels prior to 4.8.
+ */
+#ifndef __ANDROID__
 TEST_F(TRACE_syscall, skip_after_RET_TRACE)
 {
 	struct sock_filter filter[] = {
@@ -1653,6 +1658,7 @@ TEST_F_SIGNAL(TRACE_syscall, kill_after_ptrace, SIGSYS)
 	/* Tracer will redirect getpid to getppid, and we should die. */
 	EXPECT_NE(self->mypid, syscall(__NR_getpid));
 }
+#endif
 
 #ifndef __NR_seccomp
 # if defined(__i386__)
