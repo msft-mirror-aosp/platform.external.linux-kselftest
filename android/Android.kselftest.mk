@@ -118,6 +118,11 @@ module_src_files := pstore/pstore_crash_test
 include $(build_kselftest_prebuilt)
 
 
+# splice test
+module_prebuilt := splice/default_file_splice_read.sh
+module_src_files := splice/default_file_splice_read.sh
+include $(build_kselftest_prebuilt)
+
 # Static keys test
 module_prebuilt := static_keys/test_static_keys
 module_src_files := static_keys/test_static_keys.sh
