@@ -74,3 +74,7 @@ Pstore is recommended, not required, for Android.
 ### ptp/
 
 PTP support is not required by Android.
+
+### sigaltstack/
+
+This is a test for functionality that is not available in bionic (swapcontext()).
