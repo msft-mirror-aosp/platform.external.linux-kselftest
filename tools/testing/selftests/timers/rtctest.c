@@ -122,6 +122,13 @@ int main(int argc, char **argv)
 
 	fprintf(stderr, "\n\t\t\tRTC Driver Test Example.\n\n");
 
+#ifdef __ANDROID__
+	/*
+	 * Android does not rely on update interrupts so do not test them.
+	 */
+	goto test_READ;
+#endif
+
 	/* Turn on update interrupts (one per second) */
 	retval = ioctl(fd, RTC_UIE_ON, 0);
 	if (retval == -1) {
@@ -258,6 +265,13 @@ test_READ:
 		perror("RTC_AIE_OFF ioctl");
 		exit(errno);
 	}
+
+#ifdef __ANDROID__
+	/*
+	 * Android does not rely on periodic IRQs so do not test them.
+	 */
+	goto done;
+#endif
 
 test_PIE:
 	/* Read periodic IRQ rate */
