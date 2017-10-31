@@ -126,3 +126,7 @@ The skew_consistency test takes too long to run as part of VTS.
 
 This test depends on a kernel module enabled by CONFIG_TEST_USER_COPY. This
 kernel module is not required by Android.
+
+### watchdog/
+
+The watchdog test depends on CONFIG_WATCHDOG which is not required by Android.
