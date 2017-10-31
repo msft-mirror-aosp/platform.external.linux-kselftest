@@ -38,6 +38,7 @@ kselftest_modules += \
   kselftest_net_tests_socket \
   kselftest_ptrace_tests_peeksiginfo \
   kselftest_seccomp_tests_seccomp_bpf \
+  kselftest_size_test_get_size \
   kselftest_timer_tests_adjtick \
   kselftest_timer_tests_alarmtimer-suspend \
   kselftest_timer_tests_change_skew \
