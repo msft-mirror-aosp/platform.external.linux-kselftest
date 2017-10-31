@@ -6,10 +6,6 @@ kselftest_modules := \
   kselftest_intel_pstate_run.sh \
   kselftest_lib_printf \
   kselftest_lib_bitmap \
-  kselftest_pstore_pstore_tests \
-  kselftest_pstore_pstore_post_reboot_tests \
-  kselftest_pstore_common_tests \
-  kselftest_pstore_pstore_crash_test \
   kselftest_static_keys_test_static_keys \
   kselftest_sysctl_run_numerictests \
   kselftest_sysctl_run_stringtests \
