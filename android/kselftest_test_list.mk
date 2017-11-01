@@ -7,7 +7,6 @@ kselftest_modules := \
   kselftest_lib_printf \
   kselftest_lib_bitmap \
   kselftest_splice_default_file_splice_read.sh \
-  kselftest_static_keys_test_static_keys \
   kselftest_sysctl_run_numerictests \
   kselftest_sysctl_run_stringtests \
   kselftest_sysctl_common_tests \
