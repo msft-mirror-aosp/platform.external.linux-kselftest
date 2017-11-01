@@ -20,42 +20,15 @@ module_name := kselftest_$(subst /,_,$(module_prebuilt))
 module_stem := $(notdir $(module_src_files))
 module_path := $(dir $(module_src_files))
 
-prebuilt_src_file := $(kselftest_root)/$(kselftest_dir)/$(module_src_files)
-
-PRIVATE_CUSTOM_TOOL = $(ACP) -fp $< $@
-
-LOCAL_MODULE := $(module_name)-32
+LOCAL_MODULE := $(module_name)
 LOCAL_INSTALLED_MODULE_STEM := $(module_stem)
-LOCAL_MODULE_PATH := $($(TARGET_2ND_ARCH_VAR_PREFIX)TARGET_OUT_DATA_NATIVE_TESTS)/linux-kselftest/$(module_path)
-LOCAL_MODULE_CLASS := EXECUTABLES
-LOCAL_MODULE_TAGS := optional
-LOCAL_MULTILIB := 32
+LOCAL_PREBUILT_MODULE_FILE := $(LOCAL_PATH)/tools/testing/selftests/$(module_src_files)
+LOCAL_MODULE_RELATIVE_PATH := linux-kselftest/$(module_path)
+LOCAL_MODULE_CLASS := NATIVE_TESTS
+LOCAL_MULTILIB := both
 
-include $(BUILD_SYSTEM)/base_rules.mk
-$(LOCAL_BUILT_MODULE): $(prebuilt_src_file) $(kselftest_root)/android/Android.prebuilt.mk
-	$(transform-generated-source)
-vts_src_file_32 := $(LOCAL_MODULE_PATH)/$(LOCAL_INSTALLED_MODULE_STEM)
-
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := $(module_name)-64
-LOCAL_INSTALLED_MODULE_STEM := $(module_stem)
-LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_NATIVE_TESTS)/linux-kselftest/$(module_path)
-LOCAL_MODULE_CLASS := EXECUTABLES
-LOCAL_MODULE_TAGS := optional
-LOCAL_MULTILIB := 64
-
-include $(BUILD_SYSTEM)/base_rules.mk
-$(LOCAL_BUILT_MODULE): $(prebuilt_src_file) $(kselftest_root)/android/Android.prebuilt.mk
-	$(transform-generated-source)
-vts_src_file_64 := $(LOCAL_MODULE_PATH)/$(LOCAL_INSTALLED_MODULE_STEM)
-
-vts_dst_dir := $(module_path)
-include $(kselftest_root)/android/Android.vts_testcase.mk
+include $(BUILD_PREBUILT)
 
 module_name :=
 module_stem :=
 module_path :=
-vts_src_file_32 :=
-vts_src_file_64 :=
-vts_dst_dir :=
