@@ -219,30 +219,49 @@ cc_test {
     defaults: ["kselftest_defaults"],
 }
 
+// size test
+cc_test {
+    name: "kselftest_size_test",
+    relative_install_path: "linux-kselftest/size",
+    srcs: ["tools/testing/selftests/size/get_size.c"],
+    defaults: ["kselftest_defaults"],
+    nocrt: true,
+}
+
+// splice test
+cc_test {
+    name: "kselftest_splice_test",
+    relative_install_path: "linux-kselftest/splice",
+    srcs: ["tools/testing/selftests/splice/default_file_splice_read.c"],
+    defaults: ["kselftest_defaults"],
+}
+
 // Timer test
 cc_test {
     name: "kselftest_timer_tests",
     relative_install_path: "linux-kselftest/timers",
     srcs: [
-        "tools/testing/selftests/timers/posix_timers.c",
-        "tools/testing/selftests/timers/nanosleep.c",
-        "tools/testing/selftests/timers/nsleep-lat.c",
-        "tools/testing/selftests/timers/set-timer-lat.c",
-        "tools/testing/selftests/timers/inconsistency-check.c",
-        "tools/testing/selftests/timers/raw_skew.c",
-        "tools/testing/selftests/timers/threadtest.c",
-        "tools/testing/selftests/timers/rtctest.c",
-        "tools/testing/selftests/timers/alarmtimer-suspend.c",
-        "tools/testing/selftests/timers/valid-adjtimex.c",
         "tools/testing/selftests/timers/adjtick.c",
+        "tools/testing/selftests/timers/alarmtimer-suspend.c",
         "tools/testing/selftests/timers/change_skew.c",
-        "tools/testing/selftests/timers/skew_consistency.c",
         "tools/testing/selftests/timers/clocksource-switch.c",
+        "tools/testing/selftests/timers/freq-step.c",
+        "tools/testing/selftests/timers/inconsistency-check.c",
         "tools/testing/selftests/timers/leap-a-day.c",
         "tools/testing/selftests/timers/leapcrash.c",
-        "tools/testing/selftests/timers/set-tai.c",
+        "tools/testing/selftests/timers/nanosleep.c",
+        "tools/testing/selftests/timers/nsleep-lat.c",
+        "tools/testing/selftests/timers/posix_timers.c",
+        "tools/testing/selftests/timers/raw_skew.c",
+        "tools/testing/selftests/timers/rtctest.c",
+        "tools/testing/selftests/timers/rtctest_setdate.c",
         "tools/testing/selftests/timers/set-2038.c",
+        "tools/testing/selftests/timers/set-tai.c",
+        "tools/testing/selftests/timers/set-timer-lat.c",
         "tools/testing/selftests/timers/set-tz.c",
+        "tools/testing/selftests/timers/skew_consistency.c",
+        "tools/testing/selftests/timers/threadtest.c",
+        "tools/testing/selftests/timers/valid-adjtimex.c",
     ],
     cflags: [
         "-O3",

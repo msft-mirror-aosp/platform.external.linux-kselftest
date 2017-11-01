@@ -6,15 +6,7 @@ kselftest_modules := \
   kselftest_intel_pstate_run.sh \
   kselftest_lib_printf \
   kselftest_lib_bitmap \
-  kselftest_ntb_ntb_test.sh \
-  kselftest_pstore_pstore_tests \
-  kselftest_pstore_pstore_post_reboot_tests \
-  kselftest_pstore_common_tests \
-  kselftest_pstore_pstore_crash_test \
-  kselftest_static_keys_test_static_keys \
-  kselftest_sysctl_run_numerictests \
-  kselftest_sysctl_run_stringtests \
-  kselftest_sysctl_common_tests \
+  kselftest_splice_default_file_splice_read.sh \
   kselftest_user_test_user_copy \
   kselftest_zram_zram.sh \
   kselftest_zram_zram01.sh \
@@ -43,23 +35,17 @@ kselftest_modules += \
   kselftest_net_tests_socket \
   kselftest_ptrace_tests_peeksiginfo \
   kselftest_seccomp_tests_seccomp_bpf \
-  kselftest_timer_tests_adjtick \
+  kselftest_size_test_get_size \
+  kselftest_splice_test_default_file_splice_read \
   kselftest_timer_tests_alarmtimer-suspend \
-  kselftest_timer_tests_change_skew \
-  kselftest_timer_tests_clocksource-switch \
   kselftest_timer_tests_inconsistency-check \
-  kselftest_timer_tests_leap-a-day \
-  kselftest_timer_tests_leapcrash \
   kselftest_timer_tests_nanosleep \
   kselftest_timer_tests_nsleep-lat \
   kselftest_timer_tests_posix_timers \
   kselftest_timer_tests_raw_skew \
   kselftest_timer_tests_rtctest \
-  kselftest_timer_tests_set-2038 \
   kselftest_timer_tests_set-tai \
   kselftest_timer_tests_set-timer-lat \
-  kselftest_timer_tests_set-tz \
-  kselftest_timer_tests_skew_consistency \
   kselftest_timer_tests_threadtest \
   kselftest_timer_tests_valid-adjtimex \
   kselftest_vm_tests_compaction_test \

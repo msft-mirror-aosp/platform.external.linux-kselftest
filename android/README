@@ -62,3 +62,62 @@ Android.
 
 These tests depend on CONFIG_USER_NS and CONFIG_PID_NS, neither of which are
 required by Android.
+
+### ntb/
+
+NTB (non-transparent bridge) is not required by Android.
+
+### pstore/
+
+Pstore is recommended, not required, for Android.
+
+### ptp/
+
+PTP support is not required by Android.
+
+### sigaltstack/
+
+This is a test for functionality that is not available in bionic (swapcontext()).
+
+### static_keys/
+
+This test depends on a kernel module enabled by CONFIG_TEST_STATIC_KEYS. This
+kernel module is not required by Android.
+
+### sync/
+
+These tests verify the legacy sync API which is deprecated on Android.
+
+### sysctl
+
+This test depends on a kernel module enabled by CONFIG_TEST_SYSCTL. This kernel
+module is not required by Android.
+
+### timers/
+
+The adjtick test adjusts the system time and takes 2 minutes.
+
+The change_skew test takes too long to run as part of VTS.
+
+The clocksource_switch test takes too long to run as part of VTS and also tries
+all clocksources.
+
+The freq_step test relies on clocks having a greater precision than what may be
+available.
+
+The leap-a-day test repeatedly modifies the system date in order to test leap
+second behavior. This may disrupt the target environment.
+
+The leapcrash test adjusts the system date and takes several minutes to run.
+
+The mqueue_lat test relies on mq_* calls which are not present on Android.
+
+The rtctest_setdate test modifies the RTC's time and date which may disrupt the
+target environment.
+
+The set-2038 test repeatedly sets the time in order to test edge cases. This
+may disrupt the target enviornment. The test also takes a long time.
+
+The set-tz test sets the timezone which may disrupt the target environment.
+
+The skew_consistency test takes too long to run as part of VTS.
