@@ -219,6 +219,15 @@ cc_test {
     defaults: ["kselftest_defaults"],
 }
 
+// size test
+cc_test {
+    name: "kselftest_size_test",
+    relative_install_path: "linux-kselftest/size",
+    srcs: ["tools/testing/selftests/size/get_size.c"],
+    defaults: ["kselftest_defaults"],
+    nocrt: true,
+}
+
 // Timer test
 cc_test {
     name: "kselftest_timer_tests",
