@@ -7,9 +7,6 @@ kselftest_modules := \
   kselftest_lib_printf \
   kselftest_lib_bitmap \
   kselftest_splice_default_file_splice_read.sh \
-  kselftest_sysctl_run_numerictests \
-  kselftest_sysctl_run_stringtests \
-  kselftest_sysctl_common_tests \
   kselftest_user_test_user_copy \
   kselftest_zram_zram.sh \
   kselftest_zram_zram01.sh \
