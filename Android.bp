@@ -228,6 +228,14 @@ cc_test {
     nocrt: true,
 }
 
+// splice test
+cc_test {
+    name: "kselftest_splice_test",
+    relative_install_path: "linux-kselftest/splice",
+    srcs: ["tools/testing/selftests/splice/default_file_splice_read.c"],
+    defaults: ["kselftest_defaults"],
+}
+
 // Timer test
 cc_test {
     name: "kselftest_timer_tests",
