@@ -130,3 +130,8 @@ kernel module is not required by Android.
 ### watchdog/
 
 The watchdog test depends on CONFIG_WATCHDOG which is not required by Android.
+
+### zram/
+
+The zram test depends on CONFIG_ZSMALLOC and CONFIG_ZRAM which are not required
+by Android.

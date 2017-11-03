@@ -7,10 +7,6 @@ kselftest_modules := \
   kselftest_lib_printf \
   kselftest_lib_bitmap \
   kselftest_splice_default_file_splice_read.sh \
-  kselftest_zram_zram.sh \
-  kselftest_zram_zram01.sh \
-  kselftest_zram_zram02.sh \
-  kselftest_zram_zram_lib.sh \
 
 # From Android.bp
 kselftest_modules += \
