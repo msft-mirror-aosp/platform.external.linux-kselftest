@@ -121,3 +121,8 @@ may disrupt the target enviornment. The test also takes a long time.
 The set-tz test sets the timezone which may disrupt the target environment.
 
 The skew_consistency test takes too long to run as part of VTS.
+
+### user/
+
+This test depends on a kernel module enabled by CONFIG_TEST_USER_COPY. This
+kernel module is not required by Android.
