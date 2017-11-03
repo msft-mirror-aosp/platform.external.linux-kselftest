@@ -43,6 +43,7 @@ kselftest_modules += \
   kselftest_timer_tests_set-timer-lat \
   kselftest_timer_tests_threadtest \
   kselftest_timer_tests_valid-adjtimex \
+  kselftest_vdso_test \
   kselftest_vm_tests_compaction_test \
   kselftest_vm_tests_hugepage-mmap \
   kselftest_vm_tests_hugepage-shm \
