@@ -133,6 +133,11 @@ module_prebuilt := user/test_user_copy
 module_src_files := user/test_user_copy.sh
 include $(build_kselftest_prebuilt)
 
+# vm test
+module_prebuilt := vm/run_vmtests
+module_src_files := vm/run_vmtests
+include $(build_kselftest_prebuilt)
+
 # zram tests
 module_prebuilt := zram/zram.sh
 module_src_files := zram/zram.sh

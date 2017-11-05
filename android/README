@@ -121,3 +121,25 @@ may disrupt the target enviornment. The test also takes a long time.
 The set-tz test sets the timezone which may disrupt the target environment.
 
 The skew_consistency test takes too long to run as part of VTS.
+
+### user/
+
+This test depends on a kernel module enabled by CONFIG_TEST_USER_COPY. This
+kernel module is not required by Android.
+
+### vm/
+
+The hugepage-mmap, hugepage-shm, compaction, and map_hugetlb tests rely on
+hugetlbfs/hugetlb page support which is not required by Android.
+
+The userfaultfd test relies on the userfaultfd syscall which is not required by
+Android.
+
+### watchdog/
+
+The watchdog test depends on CONFIG_WATCHDOG which is not required by Android.
+
+### zram/
+
+The zram test depends on CONFIG_ZSMALLOC and CONFIG_ZRAM which are not required
+by Android.

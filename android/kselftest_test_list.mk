@@ -7,11 +7,7 @@ kselftest_modules := \
   kselftest_lib_printf \
   kselftest_lib_bitmap \
   kselftest_splice_default_file_splice_read.sh \
-  kselftest_user_test_user_copy \
-  kselftest_zram_zram.sh \
-  kselftest_zram_zram01.sh \
-  kselftest_zram_zram02.sh \
-  kselftest_zram_zram_lib.sh \
+  kselftest_vm_run_vmtests \
 
 # From Android.bp
 kselftest_modules += \
@@ -48,13 +44,10 @@ kselftest_modules += \
   kselftest_timer_tests_set-timer-lat \
   kselftest_timer_tests_threadtest \
   kselftest_timer_tests_valid-adjtimex \
-  kselftest_vm_tests_compaction_test \
-  kselftest_vm_tests_hugepage-mmap \
-  kselftest_vm_tests_hugepage-shm \
-  kselftest_vm_tests_map_hugetlb \
+  kselftest_vdso_test \
   kselftest_vm_tests_mlock2-tests \
   kselftest_vm_tests_on-fault-limit \
-  kselftest_vm_tests_transhuge-stress \
+  kselftest_vm64_tests_virtual_address_range \
   kselftest_x86_ptrace_syscall \
   kselftest_x86_tests_check_initial_reg_state \
   kselftest_x86_tests_ldt_gdt \
