@@ -76,6 +76,11 @@ module_prebuilt := ftrace/test.d/instances/instance-event
 module_src_files := ftrace/test.d/instances/instance-event.tc
 include $(build_kselftest_prebuilt)
 
+# futex test
+module_prebuilt := futex/functional/run.sh
+module_src_files := futex/functional/run.sh
+include $(build_kselftest_prebuilt)
+
 # intel_pstate test
 module_prebuilt := intel_pstate/run.sh
 module_src_files := intel_pstate/run.sh

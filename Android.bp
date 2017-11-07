@@ -121,11 +121,13 @@ cc_test {
     name: "kselftest_futex_tests",
     relative_install_path: "linux-kselftest/futex/functional",
     srcs: [
-        "tools/testing/selftests/futex/functional/futex_wait_timeout.c",
-        "tools/testing/selftests/futex/functional/futex_wait_wouldblock.c",
+        "tools/testing/selftests/futex/functional/futex_requeue_pi.c",
         "tools/testing/selftests/futex/functional/futex_requeue_pi_mismatched_ops.c",
-        "tools/testing/selftests/futex/functional/futex_wait_uninitialized_heap.c",
+        "tools/testing/selftests/futex/functional/futex_requeue_pi_signal_restart.c",
         "tools/testing/selftests/futex/functional/futex_wait_private_mapped_file.c",
+        "tools/testing/selftests/futex/functional/futex_wait_timeout.c",
+        "tools/testing/selftests/futex/functional/futex_wait_uninitialized_heap.c",
+        "tools/testing/selftests/futex/functional/futex_wait_wouldblock.c",
     ],
     local_include_dirs: [
         "tools/testing/selftests/futex/include",
