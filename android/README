@@ -1,5 +1,18 @@
 # Open Integration Issues
 
+### bpf/
+
+The bpf tests depend on the bpf and elf libraries, and several kernel
+config options that are not required by Android.
+
+### cpufreq/
+
+Cpufreq is not required by Android.
+
+### cpu-hotplug/
+
+Cpu hotplug is not required by Android.
+
 ### filesystems/dnotify_test.c
 
 This test has an endless loop in it. It is not currently run as part of the
@@ -23,6 +36,12 @@ required by Android.
 
 The ipc test requires CONFIG_EXPERT and CONFIG_CHECKPOINT_RESTORE be enabled,
 neither of which are required by Android.
+
+### lib/
+
+The lib/ tests rely on kernel modules enabled by CONFIG_TEST_PRINTF,
+CONFIG_TEST_BITMAP, and CONFIG_PRIME_NUMBERS. None of these are required by
+Android.
 
 ### media_tests/
 
