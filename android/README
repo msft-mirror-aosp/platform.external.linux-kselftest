@@ -5,6 +5,10 @@
 The bpf tests depend on the bpf and elf libraries, and several kernel
 config options that are not required by Android.
 
+### cpufreq/
+
+Cpufreq is not required by Android.
+
 ### filesystems/dnotify_test.c
 
 This test has an endless loop in it. It is not currently run as part of the
