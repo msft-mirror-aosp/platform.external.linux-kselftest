@@ -76,6 +76,11 @@ module_prebuilt := ftrace/test.d/instances/instance-event
 module_src_files := ftrace/test.d/instances/instance-event.tc
 include $(build_kselftest_prebuilt)
 
+# futex test
+module_prebuilt := futex/functional/run.sh
+module_src_files := futex/functional/run.sh
+include $(build_kselftest_prebuilt)
+
 # intel_pstate test
 module_prebuilt := intel_pstate/run.sh
 module_src_files := intel_pstate/run.sh
@@ -131,6 +136,11 @@ include $(build_kselftest_prebuilt)
 # User test
 module_prebuilt := user/test_user_copy
 module_src_files := user/test_user_copy.sh
+include $(build_kselftest_prebuilt)
+
+# vm test
+module_prebuilt := vm/run_vmtests
+module_src_files := vm/run_vmtests
 include $(build_kselftest_prebuilt)
 
 # zram tests

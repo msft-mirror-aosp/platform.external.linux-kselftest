@@ -121,11 +121,13 @@ cc_test {
     name: "kselftest_futex_tests",
     relative_install_path: "linux-kselftest/futex/functional",
     srcs: [
-        "tools/testing/selftests/futex/functional/futex_wait_timeout.c",
-        "tools/testing/selftests/futex/functional/futex_wait_wouldblock.c",
+        "tools/testing/selftests/futex/functional/futex_requeue_pi.c",
         "tools/testing/selftests/futex/functional/futex_requeue_pi_mismatched_ops.c",
-        "tools/testing/selftests/futex/functional/futex_wait_uninitialized_heap.c",
+        "tools/testing/selftests/futex/functional/futex_requeue_pi_signal_restart.c",
         "tools/testing/selftests/futex/functional/futex_wait_private_mapped_file.c",
+        "tools/testing/selftests/futex/functional/futex_wait_timeout.c",
+        "tools/testing/selftests/futex/functional/futex_wait_uninitialized_heap.c",
+        "tools/testing/selftests/futex/functional/futex_wait_wouldblock.c",
     ],
     local_include_dirs: [
         "tools/testing/selftests/futex/include",
@@ -270,6 +272,18 @@ cc_test {
     defaults: ["kselftest_defaults"],
 }
 
+// vdso test
+cc_test {
+    name: "kselftest_vdso_test",
+    relative_install_path: "linux-kselftest/vDSO",
+    srcs: [
+        "tools/testing/selftests/vDSO/parse_vdso.c",
+        "tools/testing/selftests/vDSO/vdso_test.c",
+    ],
+    defaults: ["kselftest_defaults"],
+    test_per_src: false,
+}
+
 // Vm test
 cc_test {
     name: "kselftest_vm_tests",
@@ -279,11 +293,30 @@ cc_test {
         "tools/testing/selftests/vm/hugepage-mmap.c",
         "tools/testing/selftests/vm/hugepage-shm.c",
         "tools/testing/selftests/vm/map_hugetlb.c",
+        "tools/testing/selftests/vm/mlock-random-test.c",
         "tools/testing/selftests/vm/mlock2-tests.c",
         "tools/testing/selftests/vm/on-fault-limit.c",
+        "tools/testing/selftests/vm/thuge-gen.c",
         "tools/testing/selftests/vm/transhuge-stress.c",
     ],
     defaults: ["kselftest_defaults"],
+    static_libs: ["libcap"],
+}
+
+cc_test {
+    name: "kselftest_vm64_tests",
+    relative_install_path: "linux-kselftest/vm",
+    srcs: [
+        "tools/testing/selftests/vm/virtual_address_range.c",
+    ],
+    defaults: ["kselftest_defaults"],
+    enabled: false,
+    arch: {
+        arm64: {
+            enabled: true,
+            cflags: ["-D__aarch64__"],
+        }
+    }
 }
 
 // x86 test

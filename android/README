@@ -1,5 +1,18 @@
 # Open Integration Issues
 
+### bpf/
+
+The bpf tests depend on the bpf and elf libraries, and several kernel
+config options that are not required by Android.
+
+### cpufreq/
+
+Cpufreq is not required by Android.
+
+### cpu-hotplug/
+
+Cpu hotplug is not required by Android.
+
 ### filesystems/dnotify_test.c
 
 This test has an endless loop in it. It is not currently run as part of the
@@ -23,6 +36,12 @@ required by Android.
 
 The ipc test requires CONFIG_EXPERT and CONFIG_CHECKPOINT_RESTORE be enabled,
 neither of which are required by Android.
+
+### lib/
+
+The lib/ tests rely on kernel modules enabled by CONFIG_TEST_PRINTF,
+CONFIG_TEST_BITMAP, and CONFIG_PRIME_NUMBERS. None of these are required by
+Android.
 
 ### media_tests/
 
@@ -121,3 +140,25 @@ may disrupt the target enviornment. The test also takes a long time.
 The set-tz test sets the timezone which may disrupt the target environment.
 
 The skew_consistency test takes too long to run as part of VTS.
+
+### user/
+
+This test depends on a kernel module enabled by CONFIG_TEST_USER_COPY. This
+kernel module is not required by Android.
+
+### vm/
+
+The hugepage-mmap, hugepage-shm, compaction, and map_hugetlb tests rely on
+hugetlbfs/hugetlb page support which is not required by Android.
+
+The userfaultfd test relies on the userfaultfd syscall which is not required by
+Android.
+
+### watchdog/
+
+The watchdog test depends on CONFIG_WATCHDOG which is not required by Android.
+
+### zram/
+
+The zram test depends on CONFIG_ZSMALLOC and CONFIG_ZRAM which are not required
+by Android.
