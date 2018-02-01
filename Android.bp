@@ -200,6 +200,7 @@ cc_test {
         "tools/testing/selftests/net/psock_fanout.c",
         "tools/testing/selftests/net/psock_tpacket.c",
         "tools/testing/selftests/net/reuseport_dualstack.c",
+        "tools/testing/selftests/net/reuseaddr_conflict.c",
     ],
     defaults: ["kselftest_defaults"],
     // TODO: test_data: net/test_bpf.sh
