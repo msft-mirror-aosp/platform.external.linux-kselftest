@@ -349,6 +349,11 @@ cc_test {
                 "tools/testing/selftests/x86/test_FISTTP.c",
                 "tools/testing/selftests/x86/vdso_restorer.c",
             ],
+            // Allow text (read-only) relocations, which is the default
+            // for ld.bfd, but not lld.
+            ldflags: [
+                "-Wl,-z,notext",
+            ],
         },
     },
     cflags: [
@@ -401,6 +406,11 @@ cc_test {
     arch: {
         x86: {
             enabled: true,
+            // Allow text (read-only) relocations, which is the default
+            // for ld.bfd, but not lld.
+            ldflags: [
+                "-Wl,-z,notext",
+            ],
         },
     },
 }
