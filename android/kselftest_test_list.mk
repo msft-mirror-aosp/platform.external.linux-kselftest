@@ -32,6 +32,7 @@ kselftest_modules += \
   kselftest_kcmp_tests_kcmp_test \
   kselftest_net_tests_psock_tpacket \
   kselftest_net_tests_socket \
+  kselftest_net_tests_reuseaddr_conflict \
   kselftest_ptrace_tests_peeksiginfo \
   kselftest_seccomp_tests_seccomp_bpf \
   kselftest_size_test_get_size \
