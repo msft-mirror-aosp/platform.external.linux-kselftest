@@ -387,6 +387,7 @@ cc_test {
     // that its interpreter doesn't destroy its initial state.
     ldflags: ["-Wl,-ereal_start"],
     static_executable: true,
+    test_per_src: false,
     defaults: ["kselftest_defaults"],
 }
 
