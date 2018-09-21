@@ -328,7 +328,6 @@ cc_test {
         "tools/testing/selftests/x86/single_step_syscall.c",
         "tools/testing/selftests/x86/syscall_nt.c",
         "tools/testing/selftests/x86/test_mremap_vdso.c",
-        "tools/testing/selftests/x86/check_initial_reg_state.c",
         "tools/testing/selftests/x86/ldt_gdt.c"
     ],
     arch: {
@@ -353,9 +352,36 @@ cc_test {
     },
     cflags: [
         "-O2",
-        "-std=gnu99",
         "-pthread",
     ],
+    c_std: "gnu99",
+    defaults: ["kselftest_defaults"],
+}
+
+cc_test {
+    name: "kselftest_x86_check_initial_reg_state",
+    stem: "check_initial_reg_state",
+    relative_install_path: "linux-kselftest/x86",
+    srcs: [
+        "tools/testing/selftests/x86/check_initial_reg_state.c",
+    ],
+    arch: {
+        arm: {
+            enabled: false,
+        },
+        arm64: {
+            enabled: false,
+        },
+    },
+    cflags: [
+        "-O2",
+        "-pthread",
+    ],
+    c_std: "gnu99",
+    // check_initial_reg_state is special: it needs a custom entry, and it needs to be static so
+    // that its interpreter doesn't destroy its initial state.
+    ldflags: ["-Wl,-ereal_start"],
+    static_executable: true,
     defaults: ["kselftest_defaults"],
 }
 
@@ -369,9 +395,9 @@ cc_test {
     ],
     cflags: [
         "-O2",
-        "-std=gnu99",
         "-pthread",
     ],
+    c_std: "gnu99",
     test_per_src: false,
     defaults: ["kselftest_defaults"],
     enabled: false,
@@ -392,9 +418,9 @@ cc_test {
     ],
     cflags: [
         "-O2",
-        "-std=gnu99",
         "-pthread",
     ],
+    c_std: "gnu99",
     test_per_src: false,
     defaults: ["kselftest_defaults"],
     enabled: false,
