@@ -53,7 +53,7 @@ kselftest_modules += \
   kselftest_vm_tests_on-fault-limit \
   kselftest_vm64_tests_virtual_address_range \
   kselftest_x86_ptrace_syscall \
-  kselftest_x86_tests_check_initial_reg_state \
+  kselftest_x86_check_initial_reg_state \
   kselftest_x86_tests_ldt_gdt \
   kselftest_x86_tests_single_step_syscall \
   kselftest_x86_tests_syscall_arg_fault \
