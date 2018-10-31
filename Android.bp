@@ -36,6 +36,7 @@ cc_defaults {
         "-Wno-switch",
         "-Wno-absolute-value",
         "-Wno-non-literal-null-conversion",
+        "-Wno-unused-value",
         "-Wno-unused-variable",
         "-Wno-unused-parameter",
         "-Wno-empty-body",
