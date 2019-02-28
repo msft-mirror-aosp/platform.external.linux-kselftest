@@ -215,6 +215,14 @@ cc_test {
     defaults: ["kselftest_defaults"],
 }
 
+// rtc test
+cc_test {
+    name: "kselftest_rtc_tests",
+    relative_install_path: "linux-kselftest/rtc",
+    srcs: ["tools/testing/selftests/rtc/rtctest.c"],
+    defaults: ["kselftest_defaults"],
+}
+
 // seccomp test
 cc_test {
     name: "kselftest_seccomp_tests",
@@ -257,8 +265,6 @@ cc_test {
         "tools/testing/selftests/timers/nsleep-lat.c",
         "tools/testing/selftests/timers/posix_timers.c",
         "tools/testing/selftests/timers/raw_skew.c",
-        "tools/testing/selftests/timers/rtctest.c",
-        "tools/testing/selftests/timers/rtctest_setdate.c",
         "tools/testing/selftests/timers/set-2038.c",
         "tools/testing/selftests/timers/set-tai.c",
         "tools/testing/selftests/timers/set-timer-lat.c",
