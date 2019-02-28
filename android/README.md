@@ -184,11 +184,20 @@ required by Android.
 The ipc test requires CONFIG_EXPERT and CONFIG_CHECKPOINT_RESTORE be enabled,
 neither of which are required by Android.
 
+### kvm/
+
+KVM is not required by Android.
+
 ### lib/
 
 The lib/ tests rely on kernel modules enabled by CONFIG_TEST_PRINTF,
 CONFIG_TEST_BITMAP, and CONFIG_PRIME_NUMBERS. None of these are required by
 Android.
+
+### locking/
+
+The wait-wound mutex test depends on a kernel module enabled by
+CONFIG_WW_MUTEX_SELFTEST which is not required by Android.
 
 ### media_tests/
 
@@ -224,6 +233,11 @@ The netdevice.sh test operates on an ethernet interface.
 The psock_fanout test depends on CONFIG_BPF_SYSCALL which is not required on
 Android.
 
+### netfilter/
+
+These tests depend on CONFIG_NET_NS and CONFIG_NF_TABLES_INET, neither of which
+are required by Android.
+
 ### nsfs/
 
 These tests depend on CONFIG_USER_NS and CONFIG_PID_NS, neither of which are
@@ -240,6 +254,10 @@ Pstore is recommended, not required, for Android.
 ### ptp/
 
 PTP support is not required by Android.
+
+### rseq/
+
+The rseq system call, enabled by CONFIG_RSEQ, is not required by Android.
 
 ### sigaltstack/
 
@@ -287,6 +305,10 @@ may disrupt the target enviornment. The test also takes a long time.
 The set-tz test sets the timezone which may disrupt the target environment.
 
 The skew_consistency test takes too long to run as part of VTS.
+
+### uevent/
+
+This test depends on CONFIG_USER_NS which is not required by Android.
 
 ### user/
 
