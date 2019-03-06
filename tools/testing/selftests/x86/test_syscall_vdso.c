@@ -30,6 +30,7 @@
 #include <sys/time.h>
 #include <elf.h>
 #include <sys/ptrace.h>
+#include <sys/utsname.h>
 #include <sys/wait.h>
 
 #if !defined(__i386__)
@@ -71,6 +72,7 @@ struct regs64 {
 };
 struct regs64 regs64;
 int kernel_is_64bit;
+int clobber_ok;
 
 asm (
 	"	.pushsection .text\n"
@@ -130,6 +132,28 @@ void print_regs64(void)
 	printf("12:%016llx 13:%016llx 14:%016llx 15:%016llx\n", regs64.r12,  regs64.r13,  regs64.r14,  regs64.r15);
 }
 
+static void get_kernel_version(int *version, int *patchlevel)
+{
+	int ret, sublevel;
+	struct utsname utsname;
+
+	ret = uname(&utsname);
+	if (ret) {
+		perror("uname");
+		exit(1);
+	}
+
+	ret = sscanf(utsname.release, "%d.%d.%d", version, patchlevel,
+		     &sublevel);
+	if (ret < 0) {
+		perror("sscanf");
+		exit(1);
+	} else if (ret != 3) {
+		printf("Malformed kernel version %s\n", utsname.release);
+		exit(1);
+	}
+}
+
 int check_regs64(void)
 {
 	int err = 0;
@@ -166,6 +190,11 @@ int check_regs64(void)
 			 * Historically (and probably unintentionally), they
 			 * were clobbered or zeroed.
 			 */
+			if (clobber_ok && *r64 == 0 && num <= 11) {
+				printf("Warning: kernel zeroed r%d, "
+				       "allowing on < v4.17\n", num);
+				continue;
+			}
 		}
 		printf("[FAIL]\tR%d has changed:%016llx\n", num, *r64);
 		err++;
@@ -385,6 +414,7 @@ int main(int argc, char **argv, char **envp)
 {
 	int exitcode = 0;
 	int cs;
+	int version, patchlevel;
 
 	asm("\n"
 	"	movl	%%cs, %%eax\n"
@@ -393,6 +423,9 @@ int main(int argc, char **argv, char **envp)
 	kernel_is_64bit = (cs == 0x23);
 	if (!kernel_is_64bit)
 		printf("[NOTE]\tNot a 64-bit kernel, won't test R8..R15 leaks\n");
+
+	get_kernel_version(&version, &patchlevel);
+	clobber_ok = version < 4 || (version == 4 && patchlevel < 17);
 
 	/* This only works for non-static builds:
 	 * syscall_addr = dlsym(dlopen("linux-gate.so.1", RTLD_NOW), "__kernel_vsyscall");
