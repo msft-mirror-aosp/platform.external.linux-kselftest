@@ -34,6 +34,7 @@ kselftest_modules += \
   kselftest_net_tests_socket \
   kselftest_net_tests_reuseaddr_conflict \
   kselftest_ptrace_tests_peeksiginfo \
+  kselftest_rtc_tests_rtctest \
   kselftest_seccomp_tests_seccomp_bpf \
   kselftest_size_test_get_size \
   kselftest_splice_test_default_file_splice_read \
