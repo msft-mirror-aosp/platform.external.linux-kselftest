@@ -320,7 +320,7 @@ cc_test {
     }
 }
 
-// x86 test
+// x86 tests
 cc_test {
     name: "kselftest_x86_tests",
     relative_install_path: "linux-kselftest/x86",
@@ -355,6 +355,7 @@ cc_test {
         "-pthread",
     ],
     c_std: "gnu99",
+    static_executable: true,
     defaults: ["kselftest_defaults"],
 }
 
@@ -422,6 +423,7 @@ cc_test {
         "-pthread",
     ],
     c_std: "gnu99",
+    static_executable: true,
     test_per_src: false,
     defaults: ["kselftest_defaults"],
     enabled: false,
