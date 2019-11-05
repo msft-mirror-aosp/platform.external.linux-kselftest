@@ -587,6 +587,9 @@ cc_test {
                 "tools/testing/selftests/x86/test_FISTTP.c",
                 "tools/testing/selftests/x86/vdso_restorer.c",
             ],
+            static_libs: [
+                "libdl",
+            ],
         },
     },
     cflags: [
