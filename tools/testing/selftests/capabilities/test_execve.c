@@ -91,7 +91,7 @@ static bool create_and_enter_ns(uid_t inner_uid)
 	uid_t outer_uid;
 	gid_t outer_gid;
 	int i;
-	bool have_outer_privilege;
+	bool have_outer_privilege = false;
 
 	outer_uid = getuid();
 	outer_gid = getgid();
@@ -123,8 +123,6 @@ static bool create_and_enter_ns(uid_t inner_uid)
 		maybe_write_file("/proc/self/setgroups", "deny");
 		write_file("/proc/self/uid_map", "%d %d 1", inner_uid, outer_uid);
 		write_file("/proc/self/gid_map", "0 %d 1", outer_gid);
-
-		have_outer_privilege = false;
 	} else {
 		ksft_exit_skip("must be root or be able to create a userns\n");
 	}
@@ -430,8 +428,6 @@ int main(int argc, char **argv)
 {
 	char *tmp1, *tmp2, *our_path;
 
-	ksft_print_header();
-
 	/* Find our path */
 	tmp1 = strdup(argv[0]);
 	if (!tmp1)
@@ -445,6 +441,8 @@ int main(int argc, char **argv)
 	mpid = getpid();
 
 	if (fork_wait()) {
+		ksft_print_header();
+		ksft_set_plan(12);
 		ksft_print_msg("[RUN]\t+++ Tests with uid == 0 +++\n");
 		return do_tests(0, our_path);
 	}
@@ -452,6 +450,8 @@ int main(int argc, char **argv)
 	ksft_print_msg("==================================================\n");
 
 	if (fork_wait()) {
+		ksft_print_header();
+		ksft_set_plan(9);
 		ksft_print_msg("[RUN]\t+++ Tests with uid != 0 +++\n");
 		return do_tests(1, our_path);
 	}
