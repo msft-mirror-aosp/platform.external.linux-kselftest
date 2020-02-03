@@ -123,6 +123,8 @@ static bool create_and_enter_ns(uid_t inner_uid)
 		maybe_write_file("/proc/self/setgroups", "deny");
 		write_file("/proc/self/uid_map", "%d %d 1", inner_uid, outer_uid);
 		write_file("/proc/self/gid_map", "0 %d 1", outer_gid);
+
+		have_outer_privilege = false;
 	} else {
 		ksft_exit_skip("must be root or be able to create a userns\n");
 	}
