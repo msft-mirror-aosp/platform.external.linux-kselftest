@@ -188,7 +188,7 @@ static inline int ksft_exit_xpass(void)
 	exit(KSFT_XPASS);
 }
 
-static inline int  ksft_exit_skip(const char *msg, ...)
+static inline int ksft_exit_skip(const char *msg, ...)
 {
 	if (msg) {
 		int saved_errno = errno;
