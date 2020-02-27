@@ -50,7 +50,7 @@ TEST_F(rtc, date_read) {
 }
 
 #ifndef __ANDROID__ // b/31578457
-TEST_F(rtc, uie_read) {
+TEST_F_TIMEOUT(rtc, uie_read, NUM_UIE + 2) {
 	int i, rc, irq = 0;
 	unsigned long data;
 
