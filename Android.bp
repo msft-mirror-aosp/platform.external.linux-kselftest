@@ -49,14 +49,6 @@ cc_defaults {
     no_named_install_directory: true,
 
     test_per_src: true,
-    arch: {
-        mips: {
-            enabled: false,
-        },
-        mips64: {
-            enabled: false,
-        },
-    },
 }
 
 // breakpoints test
@@ -328,7 +320,10 @@ cc_test {
 cc_test {
     name: "kselftest_membarrier_tests",
     relative_install_path: "linux-kselftest/membarrier",
-    srcs: ["tools/testing/selftests/membarrier/membarrier_test.c"],
+    srcs: [
+        "tools/testing/selftests/membarrier/membarrier_test_multi_thread.c",
+        "tools/testing/selftests/membarrier/membarrier_test_single_thread.c",
+    ],
     defaults: ["kselftest_defaults"],
 }
 

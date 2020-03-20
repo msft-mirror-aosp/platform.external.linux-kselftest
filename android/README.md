@@ -144,6 +144,9 @@ To merge in a new upstream version of kselftest:
 4. Test on all supported kernel versions, ensuring that any tests currently enabled in VTS do not generate new failures.
 5. Commit the merge.
 
+If the runtime of kselftest changes significantly be sure to update the runtime-hint and test-timeout parameters to VTS in
+`test/vts-testcase/kernel/linux_kselftest/stable/AndroidTest.xml`.
+
 Notes on Individual Tests
 -------------------------
 
