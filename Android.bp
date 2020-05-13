@@ -439,6 +439,8 @@ cc_test {
     srcs: ["tools/testing/selftests/size/get_size.c"],
     defaults: ["kselftest_defaults"],
     nocrt: true,
+    // coverage runtime calls atexit, which is unavailable with nocrt.
+    native_coverage: false,
 }
 
 // splice test
