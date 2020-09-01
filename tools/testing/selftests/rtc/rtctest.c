@@ -5,11 +5,13 @@
  * Copyright (c) 2018 Alexandre Belloni <alexandre.belloni@bootlin.com>
  */
 
+#include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <linux/rtc.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -22,6 +24,25 @@
 #define ALARM_DELTA 3
 
 static char *rtc_file = "/dev/rtc0";
+
+/* Returns 1 if file matching /dev/rtc* is found, else 0. */
+static int has_rtc(void)
+{
+	DIR *dev_dir;
+	struct dirent *dir;
+
+	dev_dir = opendir("/dev");
+	if (!dev_dir)
+		return 0;
+	while ((dir = readdir(dev_dir))) {
+		if (!strncmp(dir->d_name, "rtc", 3)) {
+			closedir(dev_dir);
+			return 1;
+		}
+	}
+	closedir(dev_dir);
+	return 0;
+}
 
 FIXTURE(rtc) {
 	int fd;
@@ -39,6 +60,9 @@ FIXTURE_TEARDOWN(rtc) {
 TEST_F(rtc, date_read) {
 	int rc;
 	struct rtc_time rtc_tm;
+
+	if (!has_rtc())
+		return;
 
 	/* Read the RTC time/date */
 	rc = ioctl(self->fd, RTC_RD_TIME, &rtc_tm);
