@@ -61,9 +61,6 @@ TEST_F(rtc, date_read) {
 	int rc;
 	struct rtc_time rtc_tm;
 
-	if (!has_rtc())
-		return;
-
 	/* Read the RTC time/date */
 	rc = ioctl(self->fd, RTC_RD_TIME, &rtc_tm);
 	ASSERT_NE(-1, rc);
@@ -358,6 +355,9 @@ int main(int argc, char **argv)
 		fprintf(stderr, "usage: %s [rtcdev]\n", argv[0]);
 		return 1;
 	}
+
+	if (!has_rtc())
+		return 0;
 
 	return test_harness_run(argc, argv);
 }
