@@ -5,14 +5,13 @@
  * Copyright (c) 2018 Alexandre Belloni <alexandre.belloni@bootlin.com>
  */
 
-#include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <linux/rtc.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/ioctl.h>
+#include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <time.h>
@@ -24,25 +23,6 @@
 #define ALARM_DELTA 3
 
 static char *rtc_file = "/dev/rtc0";
-
-/* Returns 1 if file matching /dev/rtc* is found, else 0. */
-static int has_rtc(void)
-{
-	DIR *dev_dir;
-	struct dirent *dir;
-
-	dev_dir = opendir("/dev");
-	if (!dev_dir)
-		return 0;
-	while ((dir = readdir(dev_dir))) {
-		if (!strncmp(dir->d_name, "rtc", 3)) {
-			closedir(dev_dir);
-			return 1;
-		}
-	}
-	closedir(dev_dir);
-	return 0;
-}
 
 FIXTURE(rtc) {
 	int fd;
@@ -345,6 +325,8 @@ __constructor_order_last(void)
 
 int main(int argc, char **argv)
 {
+	struct stat st;
+
 	switch (argc) {
 	case 2:
 		rtc_file = argv[1];
@@ -356,8 +338,10 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	if (!has_rtc())
+	if (stat(rtc_file, &st) < 0 || !S_ISCHR(st.st_mode)) {
+		printf("no RTC present\n");
 		return 0;
+	}
 
 	return test_harness_run(argc, argv);
 }
