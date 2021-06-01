@@ -52,6 +52,7 @@ kselftest_modules += \
   kselftest_vdso_test \
   kselftest_vm_tests_mlock2-tests \
   kselftest_vm_tests_on-fault-limit \
+  kselftest_vm_tests_userfaultfd \
   kselftest_vm64_tests_virtual_address_range \
   kselftest_x86_ptrace_syscall \
   kselftest_x86_check_initial_reg_state \
