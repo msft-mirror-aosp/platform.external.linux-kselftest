@@ -575,6 +575,7 @@ cc_test {
         "tools/testing/selftests/vm/mlock-random-test.c",
         "tools/testing/selftests/vm/mlock2-tests.c",
         "tools/testing/selftests/vm/on-fault-limit.c",
+        "tools/testing/selftests/vm/userfaultfd.c",
         "tools/testing/selftests/vm/thuge-gen.c",
         "tools/testing/selftests/vm/transhuge-stress.c",
     ],
