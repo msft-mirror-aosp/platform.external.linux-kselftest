@@ -474,6 +474,11 @@ cc_test {
     name: "kselftest_size_test",
     relative_install_path: "linux-kselftest/size",
     srcs: ["tools/testing/selftests/size/get_size.c"],
+    arch: {
+       x86_64: {
+           cflags: ["-mstackrealign"],
+       },
+    },
     defaults: ["kselftest_defaults"],
     nocrt: true,
     // coverage runtime calls atexit, which is unavailable with nocrt.
@@ -570,6 +575,7 @@ cc_test {
         "tools/testing/selftests/vm/mlock-random-test.c",
         "tools/testing/selftests/vm/mlock2-tests.c",
         "tools/testing/selftests/vm/on-fault-limit.c",
+        "tools/testing/selftests/vm/userfaultfd.c",
         "tools/testing/selftests/vm/thuge-gen.c",
         "tools/testing/selftests/vm/transhuge-stress.c",
     ],
