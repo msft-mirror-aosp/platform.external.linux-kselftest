@@ -96,6 +96,14 @@ cc_defaults {
     test_per_src: true,
 }
 
+// binderfs test
+cc_test {
+    name: "kselftest_binderfs_tests",
+    relative_install_path: "linux-kselftest/filesystems/binderfs",
+    srcs: ["tools/testing/selftests/filesystems/binderfs/binderfs_test.c"],
+    defaults: ["kselftest_defaults"],
+}
+
 // breakpoints test
 cc_test {
     name: "kselftest_breakpoints_tests",
