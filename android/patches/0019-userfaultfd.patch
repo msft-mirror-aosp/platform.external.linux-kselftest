@@ -1,8 +1,11 @@
-diff --git a/tools/testing/selftests/vm/userfaultfd.c b/tools/testing/selftests/vm/userfaultfd.c
-index d3362777a425..d8119de2a342 100644
---- a/tools/testing/selftests/vm/userfaultfd.c
+diff -u b/tools/testing/selftests/vm/userfaultfd.c b/tools/testing/selftests/vm/userfaultfd.c
+--- b/tools/testing/selftests/vm/userfaultfd.c
 +++ b/tools/testing/selftests/vm/userfaultfd.c
-@@ -85,6 +85,7 @@ static int uffd, uffd_flags, finished, *pipefd;
+@@ -82,9 +82,11 @@
+ static char *huge_fd_off0;
+ static unsigned long long *count_verify;
+ static int uffd, uffd_flags, finished, *pipefd;
++static volatile bool ready_for_fork;
  static char *area_src, *area_src_alias, *area_dst, *area_dst_alias;
  static char *zeropage;
  pthread_attr_t attr;
@@ -10,7 +13,21 @@ index d3362777a425..d8119de2a342 100644
  
  /* pthread_mutex_t starts at page offset 0 */
  #define area_mutex(___area, ___nr)					\
-@@ -284,23 +285,11 @@ static int my_bcmp(char *str1, char *str2, size_t n)
+@@ -139,8 +141,11 @@
+ 
+ static void anon_allocate_area(void **alloc_area)
+ {
+-	if (posix_memalign(alloc_area, page_size, nr_pages * page_size)) {
+-		fprintf(stderr, "out of memory\n");
++	// We can't use posix_memalign due to pointer-tagging used in bionic.
++	*alloc_area = mmap(NULL, nr_pages * page_size, PROT_READ | PROT_WRITE,
++			   MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
++	if (*alloc_area == MAP_FAILED) {
++		fprintf(stderr, "anon memory mmap failed\n");
+ 		*alloc_area = NULL;
+ 	}
+ }
+@@ -284,23 +289,11 @@
  static void *locking_thread(void *arg)
  {
  	unsigned long cpu = (unsigned long) arg;
@@ -35,7 +52,7 @@ index d3362777a425..d8119de2a342 100644
  		page_nr = -bounces;
  		if (!(bounces & BOUNCE_RACINGFAULTS))
  			page_nr += cpu * nr_pages_per_cpu;
-@@ -308,13 +297,9 @@ static void *locking_thread(void *arg)
+@@ -308,13 +301,9 @@
  
  	while (!finished) {
  		if (bounces & BOUNCE_RANDOM) {
@@ -52,7 +69,17 @@ index d3362777a425..d8119de2a342 100644
  					   16;
  			}
  		} else
-@@ -548,18 +533,31 @@ static void *uffd_poll_thread(void *arg)
+@@ -501,6 +490,9 @@
+ 	pollfd[1].fd = pipefd[cpu*2];
+ 	pollfd[1].events = POLLIN;
+ 
++	// Notify the main thread that it can now fork.
++	ready_for_fork = true;
++
+ 	for (;;) {
+ 		ret = poll(pollfd, 2, -1);
+ 		if (!ret)
+@@ -548,18 +540,31 @@
  
  pthread_mutex_t uffd_read_mutex = PTHREAD_MUTEX_INITIALIZER;
  
@@ -86,7 +113,7 @@ index d3362777a425..d8119de2a342 100644
  		if (uffd_read_msg(uffd, &msg))
  			continue;
  		(*this_cpu_userfaults) += uffd_handle_page_fault(&msg);
-@@ -608,6 +606,7 @@ static int stress(unsigned long *userfaults)
+@@ -608,6 +613,7 @@
  				   background_thread, (void *)cpu))
  			return 1;
  	}
@@ -94,7 +121,7 @@ index d3362777a425..d8119de2a342 100644
  	for (cpu = 0; cpu < nr_cpus; cpu++)
  		if (pthread_join(background_threads[cpu], NULL))
  			return 1;
-@@ -640,7 +639,7 @@ static int stress(unsigned long *userfaults)
+@@ -640,7 +646,7 @@
  			if (pthread_join(uffd_threads[cpu], &_userfaults[cpu]))
  				return 1;
  		} else {
@@ -103,7 +130,7 @@ index d3362777a425..d8119de2a342 100644
  				return 1;
  			if (pthread_join(uffd_threads[cpu], NULL))
  				return 1;
-@@ -654,7 +653,7 @@ static int userfaultfd_open(int features)
+@@ -654,7 +660,7 @@
  {
  	struct uffdio_api uffdio_api;
  
@@ -112,7 +139,53 @@ index d3362777a425..d8119de2a342 100644
  	if (uffd < 0) {
  		fprintf(stderr,
  			"userfaultfd syscall not available in this kernel\n");
-@@ -1036,6 +1035,7 @@ static int userfaultfd_stress(void)
+@@ -914,6 +920,10 @@
+ 	pid_t pid;
+ 	char c;
+ 
++	// All the syscalls below up to pthread_create will ensure that this
++	// write is completed before, the uffd_thread sets it to true.
++	ready_for_fork = false;
++
+ 	printf("testing events (fork, remap, remove): ");
+ 	fflush(stdout);
+ 
+@@ -942,6 +952,11 @@
+ 	if (pthread_create(&uffd_mon, &attr, uffd_poll_thread, NULL))
+ 		perror("uffd_poll_thread create"), exit(1);
+ 
++	// Wait for the poll_thread to start executing before forking. This is
++	// required to avoid a deadlock, which can happen if poll_thread doesn't
++	// start getting executed by the time fork is invoked.
++	while (!ready_for_fork);
++
+ 	pid = fork();
+ 	if (pid < 0)
+ 		perror("fork"), exit(1);
+@@ -974,6 +989,10 @@
+ 	pid_t pid;
+ 	char c;
+ 
++	// All the syscalls below up to pthread_create will ensure that this
++	// write is completed before, the uffd_thread sets it to true.
++	ready_for_fork = false;
++
+ 	printf("testing signal delivery: ");
+ 	fflush(stdout);
+ 
+@@ -1007,6 +1026,11 @@
+ 	if (pthread_create(&uffd_mon, &attr, uffd_poll_thread, NULL))
+ 		perror("uffd_poll_thread create"), exit(1);
+ 
++	// Wait for the poll_thread to start executing before forking. This is
++	// required to avoid a deadlock, which can happen if poll_thread doesn't
++	// start getting executed by the time fork is invoked.
++	while (!ready_for_fork);
++
+ 	pid = fork();
+ 	if (pid < 0)
+ 		perror("fork"), exit(1);
+@@ -1036,6 +1060,7 @@
  	char *tmp_area;
  	unsigned long nr;
  	struct uffdio_register uffdio_register;
@@ -120,7 +193,7 @@ index d3362777a425..d8119de2a342 100644
  	unsigned long cpu;
  	int err;
  	unsigned long userfaults[nr_cpus];
-@@ -1094,6 +1094,17 @@ static int userfaultfd_stress(void)
+@@ -1094,6 +1119,17 @@
  	pthread_attr_init(&attr);
  	pthread_attr_setstacksize(&attr, 16*1024*1024);
  
@@ -138,7 +211,7 @@ index d3362777a425..d8119de2a342 100644
  	err = 0;
  	while (bounces--) {
  		unsigned long expected_ioctls;
-@@ -1215,6 +1226,8 @@ static int userfaultfd_stress(void)
+@@ -1215,6 +1251,8 @@
  		printf("\n");
  	}
  
@@ -147,7 +220,7 @@ index d3362777a425..d8119de2a342 100644
  	if (err)
  		return err;
  
-@@ -1291,6 +1304,9 @@ static void sigalrm(int sig)
+@@ -1291,6 +1329,9 @@
  
  int main(int argc, char **argv)
  {
@@ -157,7 +230,7 @@ index d3362777a425..d8119de2a342 100644
  	if (argc < 4)
  		usage();
  
-@@ -1332,6 +1348,12 @@ int main(int argc, char **argv)
+@@ -1332,6 +1373,12 @@
  	}
  	printf("nr_pages: %lu, nr_pages_per_cpu: %lu\n",
  	       nr_pages, nr_pages_per_cpu);
