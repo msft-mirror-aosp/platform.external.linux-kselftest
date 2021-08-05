@@ -82,6 +82,7 @@ static int huge_fd;
 static char *huge_fd_off0;
 static unsigned long long *count_verify;
 static int uffd, uffd_flags, finished, *pipefd;
+static volatile bool ready_for_fork;
 static char *area_src, *area_src_alias, *area_dst, *area_dst_alias;
 static char *zeropage;
 pthread_attr_t attr;
@@ -140,8 +141,11 @@ static int anon_release_pages(char *rel_area)
 
 static void anon_allocate_area(void **alloc_area)
 {
-	if (posix_memalign(alloc_area, page_size, nr_pages * page_size)) {
-		fprintf(stderr, "out of memory\n");
+	// We can't use posix_memalign due to pointer-tagging used in bionic.
+	*alloc_area = mmap(NULL, nr_pages * page_size, PROT_READ | PROT_WRITE,
+			   MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+	if (*alloc_area == MAP_FAILED) {
+		fprintf(stderr, "anon memory mmap failed\n");
 		*alloc_area = NULL;
 	}
 }
@@ -485,6 +489,9 @@ static void *uffd_poll_thread(void *arg)
 	pollfd[0].events = POLLIN;
 	pollfd[1].fd = pipefd[cpu*2];
 	pollfd[1].events = POLLIN;
+
+	// Notify the main thread that it can now fork.
+	ready_for_fork = true;
 
 	for (;;) {
 		ret = poll(pollfd, 2, -1);
@@ -913,6 +920,10 @@ static int userfaultfd_events_test(void)
 	pid_t pid;
 	char c;
 
+	// All the syscalls below up to pthread_create will ensure that this
+	// write is completed before, the uffd_thread sets it to true.
+	ready_for_fork = false;
+
 	printf("testing events (fork, remap, remove): ");
 	fflush(stdout);
 
@@ -940,6 +951,11 @@ static int userfaultfd_events_test(void)
 
 	if (pthread_create(&uffd_mon, &attr, uffd_poll_thread, NULL))
 		perror("uffd_poll_thread create"), exit(1);
+
+	// Wait for the poll_thread to start executing before forking. This is
+	// required to avoid a deadlock, which can happen if poll_thread doesn't
+	// start getting executed by the time fork is invoked.
+	while (!ready_for_fork);
 
 	pid = fork();
 	if (pid < 0)
@@ -973,6 +989,10 @@ static int userfaultfd_sig_test(void)
 	pid_t pid;
 	char c;
 
+	// All the syscalls below up to pthread_create will ensure that this
+	// write is completed before, the uffd_thread sets it to true.
+	ready_for_fork = false;
+
 	printf("testing signal delivery: ");
 	fflush(stdout);
 
@@ -1005,6 +1025,11 @@ static int userfaultfd_sig_test(void)
 
 	if (pthread_create(&uffd_mon, &attr, uffd_poll_thread, NULL))
 		perror("uffd_poll_thread create"), exit(1);
+
+	// Wait for the poll_thread to start executing before forking. This is
+	// required to avoid a deadlock, which can happen if poll_thread doesn't
+	// start getting executed by the time fork is invoked.
+	while (!ready_for_fork);
 
 	pid = fork();
 	if (pid < 0)
