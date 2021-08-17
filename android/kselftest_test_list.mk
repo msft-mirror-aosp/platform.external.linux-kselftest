@@ -12,6 +12,7 @@ kselftest_modules := \
 
 # From Android.bp
 kselftest_modules += \
+  kselftest_binderfs_tests_binderfs_test \
   kselftest_breakpoints_tests_breakpoint_test \
   kselftest_breakpoints_tests_breakpoint_test_arm64 \
   kselftest_breakpoints_tests_step_after_suspend_test \
