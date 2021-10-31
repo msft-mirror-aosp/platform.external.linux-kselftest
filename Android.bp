@@ -94,6 +94,12 @@ cc_defaults {
     no_named_install_directory: true,
 
     test_per_src: true,
+
+    // FIXME: test fails to build with LTO
+    // http://b/241723066
+    lto: {
+        never: true,
+    },
 }
 
 // binderfs test
