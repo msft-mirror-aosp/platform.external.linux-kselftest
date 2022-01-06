@@ -1,4 +1,3 @@
-diff -u b/tools/testing/selftests/vm/userfaultfd.c b/tools/testing/selftests/vm/userfaultfd.c
 --- b/tools/testing/selftests/vm/userfaultfd.c
 +++ b/tools/testing/selftests/vm/userfaultfd.c
 @@ -82,9 +82,11 @@
@@ -243,3 +242,20 @@ diff -u b/tools/testing/selftests/vm/userfaultfd.c b/tools/testing/selftests/vm/
  	return userfaultfd_stress();
  }
  
+--- a/tools/testing/selftests/vm/userfaultfd.c
++++ b/tools/testing/selftests/vm/userfaultfd.c
+@@ -662,8 +662,13 @@ static int userfaultfd_open(int features)
+ 
+ 	uffd = syscall(__NR_userfaultfd, O_CLOEXEC | O_NONBLOCK | UFFD_USER_MODE_ONLY);
+ 	if (uffd < 0) {
++		if (errno == ENOSYS) {
++			fprintf(stderr,
++				"userfaultfd syscall not available in this kernel\n");
++			exit(KSFT_PASS);
++		}
+ 		fprintf(stderr,
+-			"userfaultfd syscall not available in this kernel\n");
++			"userfaultfd syscall failed with errno: %d\n", errno);
+ 		return 1;
+ 	}
+ 	uffd_flags = fcntl(uffd, F_GETFD, NULL);
