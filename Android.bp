@@ -340,25 +340,6 @@ cc_test {
     defaults: ["kselftest_defaults"],
 }
 
-// KVM test
-cc_test {
-    name: "kselftest_kvm_arm64_tests",
-    relative_install_path: "linux-kselftest/kvm/aarch64",
-    local_include_dirs: [ "tools/testing/selftests"],
-    arch: {
-        arm: {
-            enabled: false,
-        },
-        arm64: {
-            srcs: ["tools/testing/selftests/kvm/aarch64/pvm_wipe_mem.c"],
-        },
-        x86: {
-            enabled: false,
-        },
-    },
-    defaults: ["kselftest_defaults"],
-}
-
 // Lib test
 sh_test {
     name: "kselftest_lib_printf",
