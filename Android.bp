@@ -126,6 +126,11 @@ cc_test {
                 "tools/testing/selftests/breakpoints/breakpoint_test.c",
             ],
         },
+        x86_64: {
+            srcs: [
+                "tools/testing/selftests/breakpoints/breakpoint_test.c",
+            ],
+        },
     },
 }
 
