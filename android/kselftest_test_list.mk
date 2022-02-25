@@ -31,6 +31,7 @@ kselftest_modules += \
   kselftest_intel_pstate_tests_aperf \
   kselftest_intel_pstate_tests_msr \
   kselftest_kcmp_tests_kcmp_test \
+  kselftest_kvm_arm64_tests_pvm_wipe_mem \
   kselftest_net_tests_psock_tpacket \
   kselftest_net_tests_socket \
   kselftest_net_tests_reuseaddr_conflict \
