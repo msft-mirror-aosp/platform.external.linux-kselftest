@@ -12,7 +12,6 @@ kselftest_modules := \
 
 # From Android.bp
 kselftest_modules += \
-  kselftest_binderfs_tests_binderfs_test \
   kselftest_breakpoints_tests_breakpoint_test \
   kselftest_breakpoints_tests_breakpoint_test_arm64 \
   kselftest_breakpoints_tests_step_after_suspend_test \
@@ -31,7 +30,6 @@ kselftest_modules += \
   kselftest_intel_pstate_tests_aperf \
   kselftest_intel_pstate_tests_msr \
   kselftest_kcmp_tests_kcmp_test \
-  kselftest_kvm_arm64_tests_pvm_wipe_mem \
   kselftest_net_tests_psock_tpacket \
   kselftest_net_tests_socket \
   kselftest_net_tests_reuseaddr_conflict \
@@ -54,7 +52,6 @@ kselftest_modules += \
   kselftest_vdso_test \
   kselftest_vm_tests_mlock2-tests \
   kselftest_vm_tests_on-fault-limit \
-  kselftest_vm_tests_userfaultfd \
   kselftest_vm64_tests_virtual_address_range \
   kselftest_x86_ptrace_syscall \
   kselftest_x86_check_initial_reg_state \
