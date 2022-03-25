@@ -1,0 +1,33 @@
+From fb64f30a1f159fb3359baf547f1199f980abe5d0 Mon Sep 17 00:00:00 2001
+From: Edward Liaw <edliaw@google.com>
+Date: Wed, 23 Mar 2022 23:21:21 +0000
+Subject: [PATCH] selftests: binderfs skip when syscall unavailable
+
+Change pass to skip when the binderfs syscall is not supported
+
+Bug: 207175332
+Bug: 208276189
+Test: atest vts_linux_kselftest_arm_64:binderfs_arm_64#binderfs_arm_64
+Change-Id: If28637c69c65b28bc68e6660f1df004efc436eb8
+Signed-off-by: Edward Liaw <edliaw@google.com>
+---
+ tools/testing/selftests/filesystems/binderfs/binderfs_test.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/filesystems/binderfs/binderfs_test.c b/tools/testing/selftests/filesystems/binderfs/binderfs_test.c
+index 4465b4f..e10f237 100644
+--- a/tools/testing/selftests/filesystems/binderfs/binderfs_test.c
++++ b/tools/testing/selftests/filesystems/binderfs/binderfs_test.c
+@@ -299,8 +299,7 @@ int main(int argc, char *argv[])
+ {
+ 	/* Force success exit for older kernels */
+ 	if (!binderfs_supported()) {
+-		ksft_print_msg("Skipping tests - binderfs not supported\n");
+-		ksft_exit_pass();
++		ksft_exit_skip("binderfs syscall not supported in this kernel\n");
+ 	}
+ 
+ 	binderfs_test_privileged();
+-- 
+2.35.1.1021.g381101b075-goog
+
