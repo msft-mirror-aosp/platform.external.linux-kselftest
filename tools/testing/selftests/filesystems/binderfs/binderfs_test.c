@@ -299,7 +299,8 @@ int main(int argc, char *argv[])
 {
 	/* Force success exit for older kernels */
 	if (!binderfs_supported()) {
-		ksft_exit_skip("binderfs syscall not supported in this kernel\n");
+		ksft_print_msg("Skipping tests - binderfs not supported\n");
+		ksft_exit_pass();
 	}
 
 	binderfs_test_privileged();
