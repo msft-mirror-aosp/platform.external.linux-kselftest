@@ -12,7 +12,6 @@
 #include <sys/mount.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <sys/utsname.h>
 #include <unistd.h>
 #include <linux/android/binder.h>
 #include <linux/android/binderfs.h>
@@ -274,35 +273,8 @@ static void binderfs_test_unprivileged()
 	__do_binderfs_test();
 }
 
-/* binderfs first introduced in Linux 5.0 */
-bool binderfs_supported(void)
-{
-	const int min_kernel_version = 5;
-	struct utsname utsname;
-	int ret, version;
-
-	ret = uname(&utsname);
-	if (ret)
-		ksft_exit_fail_msg("%s - Failed to get kernel version\n",
-				   strerror(errno));
-
-	ret = sscanf(utsname.release, "%d.", &version);
-	if (ret != 1)
-		ksft_exit_fail_msg("%s - Failed to parse uname: %s\n",
-				   strerror(errno), utsname.release);
-
-	return version >= min_kernel_version? true: false;
-}
-
-
 int main(int argc, char *argv[])
 {
-	/* Force success exit for older kernels */
-	if (!binderfs_supported()) {
-		ksft_print_msg("Skipping tests - binderfs not supported\n");
-		ksft_exit_pass();
-	}
-
 	binderfs_test_privileged();
 	binderfs_test_unprivileged();
 	ksft_exit_pass();
