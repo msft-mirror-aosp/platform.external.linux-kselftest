@@ -1330,6 +1330,11 @@ static int userfaultfd_minor_test(void)
 #define PM_SWAP                       BIT_ULL(62)
 #define PM_PRESENT                    BIT_ULL(63)
 
+/*
+ * b/232026677
+ * pagemap not compatible with < 5.14
+ */
+#ifndef __ANDROID__
 static int pagemap_open(void)
 {
 	int fd = open("/proc/self/pagemap", O_RDONLY);
@@ -1455,6 +1460,7 @@ static void userfaultfd_pagemap_test(unsigned int test_pgsize)
 	close(pagemap_fd);
 	printf("done\n");
 }
+#endif
 
 static int userfaultfd_stress(void)
 {
@@ -1593,6 +1599,11 @@ static int userfaultfd_stress(void)
 		uffd_stats_report(uffd_stats, nr_cpus);
 	}
 
+/*
+ * b/232026677
+ * pagemap not compatible with < 5.14
+ */
+#ifndef __ANDROID__
 	if (test_type == TEST_ANON) {
 		/*
 		 * shmem/hugetlb won't be able to run since they have different
@@ -1607,6 +1618,7 @@ static int userfaultfd_stress(void)
 		 */
 		userfaultfd_pagemap_test(page_size * 512);
 	}
+#endif
 
 	pthread_key_delete(long_jmp_key);
 
