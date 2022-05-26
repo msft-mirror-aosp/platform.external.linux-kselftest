@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
-#include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <time.h>
@@ -50,7 +49,6 @@ TEST_F(rtc, date_read) {
 	       rtc_tm.tm_hour, rtc_tm.tm_min, rtc_tm.tm_sec);
 }
 
-#ifndef __ANDROID__ // b/31578457
 TEST_F_TIMEOUT(rtc, uie_read, NUM_UIE + 2) {
 	int i, rc, irq = 0;
 	unsigned long data;
@@ -314,7 +312,6 @@ TEST_F_TIMEOUT(rtc, alarm_wkalm_set_minute, 65) {
 	new = timegm((struct tm *)&tm);
 	ASSERT_EQ(new, secs);
 }
-#endif
 
 static void __attribute__((constructor))
 __constructor_order_last(void)
@@ -325,8 +322,6 @@ __constructor_order_last(void)
 
 int main(int argc, char **argv)
 {
-	struct stat st;
-
 	switch (argc) {
 	case 2:
 		rtc_file = argv[1];
@@ -336,11 +331,6 @@ int main(int argc, char **argv)
 	default:
 		fprintf(stderr, "usage: %s [rtcdev]\n", argv[0]);
 		return 1;
-	}
-
-	if (stat(rtc_file, &st) < 0 || !S_ISCHR(st.st_mode)) {
-		printf("no RTC present\n");
-		return 0;
 	}
 
 	return test_harness_run(argc, argv);
