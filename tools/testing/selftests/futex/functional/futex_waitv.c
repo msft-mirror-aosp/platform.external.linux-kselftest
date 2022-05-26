@@ -47,6 +47,11 @@ void *waiterfn(void *arg)
 
 	res = futex_waitv(waitv, NR_FUTEXES, 0, &to, CLOCK_MONOTONIC);
 	if (res < 0) {
+		if (errno == ENOSYS) {
+			ksft_test_result_skip("futex_waitv syscall not available in this kernel\n");
+			ksft_print_cnts();
+			exit(KSFT_SKIP);
+		}
 		ksft_test_result_fail("futex_waitv returned: %d %s\n",
 				      errno, strerror(errno));
 	} else if (res != NR_FUTEXES - 1) {
