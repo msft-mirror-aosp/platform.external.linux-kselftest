@@ -1,7 +1,18 @@
+From b3185f1f6bc49ed8d728be472c9ef04248adf348 Mon Sep 17 00:00:00 2001
+From: Edward Liaw <edliaw@google.com>
+Date: Tue, 19 Apr 2022 23:12:41 +0000
+Subject: [PATCH 14/24] seccomp bpf
+
 Disable further incompatible seccomp subtests.
 
+(cherry picked from commit 95b95a72b438f8efc105091f6122d0e99fd880b0)
 Bug: 147676645
+---
+ tools/testing/selftests/seccomp/seccomp_bpf.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
+diff --git a/tools/testing/selftests/seccomp/seccomp_bpf.c b/tools/testing/selftests/seccomp/seccomp_bpf.c
+index 65b81fa4aaca8..b575afa3bbb33 100644
 --- a/tools/testing/selftests/seccomp/seccomp_bpf.c
 +++ b/tools/testing/selftests/seccomp/seccomp_bpf.c
 @@ -13,12 +13,14 @@
@@ -19,7 +30,7 @@ Bug: 147676645
  
  #include <errno.h>
  #include <linux/filter.h>
-@@ -475,6 +477,8 @@
+@@ -565,6 +567,8 @@ TEST(empty_prog)
  	EXPECT_EQ(EINVAL, errno);
  }
  
@@ -28,7 +39,7 @@ Bug: 147676645
  TEST(log_all)
  {
  	struct sock_filter filter[] = {
-@@ -496,6 +500,7 @@
+@@ -586,6 +590,7 @@ TEST(log_all)
  	/* getppid() should succeed and be logged (no check for logging) */
  	EXPECT_EQ(parent, syscall(__NR_getppid));
  }
@@ -36,7 +47,7 @@ Bug: 147676645
  
  TEST_SIGNAL(unknown_ret_is_kill_inside, SIGSYS)
  {
-@@ -748,6 +753,8 @@
+@@ -848,6 +853,8 @@ void kill_thread_or_group(struct __test_metadata *_metadata,
  	exit(42);
  }
  
@@ -45,7 +56,7 @@ Bug: 147676645
  TEST(KILL_thread)
  {
  	int status;
-@@ -766,6 +773,7 @@
+@@ -866,6 +873,7 @@ TEST(KILL_thread)
  	ASSERT_TRUE(WIFEXITED(status));
  	ASSERT_EQ(42, WEXITSTATUS(status));
  }
@@ -53,7 +64,7 @@ Bug: 147676645
  
  TEST(KILL_process)
  {
-@@ -1313,6 +1321,8 @@
+@@ -1434,6 +1442,8 @@ TEST_F(precedence, trace_is_fourth_in_any_order)
  	EXPECT_EQ(-1, syscall(__NR_getpid));
  }
  
@@ -62,32 +73,15 @@ Bug: 147676645
  TEST_F(precedence, log_is_fifth)
  {
  	pid_t mypid, parent;
-@@ -1352,6 +1362,7 @@
+@@ -1453,6 +1463,7 @@ TEST_F(precedence, log_is_fifth)
  	/* Should also work just fine */
  	EXPECT_EQ(mypid, syscall(__NR_getpid));
  }
 +#endif
  
- #ifndef PTRACE_O_TRACESECCOMP
- #define PTRACE_O_TRACESECCOMP	0x00000080
-@@ -1871,6 +1882,8 @@
- 		free(self->prog.filter);
- }
- 
-+/* b/147676645 */
-+#if 0
- TEST_F(TRACE_syscall, ptrace_syscall_redirected)
+ TEST_F(precedence, log_is_fifth_in_any_order)
  {
- 	/* Swap SECCOMP_RET_TRACE tracer for PTRACE_SYSCALL tracer. */
-@@ -1903,6 +1916,7 @@
- 	/* Tracer should skip the gettid syscall, resulting fake pid. */
- 	EXPECT_SYSCALL_RETURN(45000, syscall(__NR_gettid));
- }
-+#endif
- 
- TEST_F(TRACE_syscall, syscall_allowed)
- {
-@@ -2181,6 +2195,8 @@
+@@ -2372,6 +2383,8 @@ TEST(seccomp_syscall_mode_lock)
  	}
  }
  
@@ -96,7 +90,7 @@ Bug: 147676645
  /*
   * Test detection of known and unknown filter flags. Userspace needs to be able
   * to check if a filter flag is supported by the current kernel and a good way
-@@ -2270,6 +2286,7 @@
+@@ -2462,6 +2475,7 @@ TEST(detect_seccomp_filter_flags)
  		       flag);
  	}
  }
@@ -104,7 +98,7 @@ Bug: 147676645
  
  TEST(TSYNC_first)
  {
-@@ -2916,6 +2933,8 @@
+@@ -3159,6 +3173,8 @@ TEST(syscall_restart)
  		_metadata->passed = 0;
  }
  
@@ -113,22 +107,14 @@ Bug: 147676645
  TEST_SIGNAL(filter_flag_log, SIGSYS)
  {
  	struct sock_filter allow_filter[] = {
-@@ -3077,7 +3096,10 @@
+@@ -3320,6 +3336,7 @@ TEST(get_metadata)
  skip:
  	ASSERT_EQ(0, kill(pid, SIGKILL));
  }
 +#endif
  
-+/* b/147676645 */
-+#if 0
- static int user_trap_syscall(int nr, unsigned int flags)
+ static int user_notif_syscall(int nr, unsigned int flags)
  {
- 	struct sock_filter filter[] = {
-@@ -3618,6 +3640,7 @@
- 		}
- 	}
- }
-+#endif
- 
- /*
-  * TODO:
+-- 
+2.36.0.550.gb090851708-goog
+

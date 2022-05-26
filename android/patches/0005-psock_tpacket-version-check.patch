@@ -1,3 +1,8 @@
+From e92e5b3a6f6800ae39b1e1e3bb02b746b7d215c0 Mon Sep 17 00:00:00 2001
+From: Edward Liaw <edliaw@google.com>
+Date: Tue, 19 Apr 2022 22:54:43 +0000
+Subject: [PATCH 05/24] psock_tpacket: version check
+
 TX_RING support for TPACKET_V3 was added in this commit:
 
 commit 7f953ab2ba46e8649537942c0a64668ca2ce5cc5
@@ -9,11 +14,16 @@ Date:   Tue Jan 3 06:31:47 2017 -0800
 which first appeared in 4.11. Do not attempt to test TX_RING
 support for TPACKET_V3 on kernels earlier than this.
 
+(cherry picked from commit 1584e465aa445831fc93bcd64d560ab5b89cb55d)
+---
+ tools/testing/selftests/net/psock_tpacket.c | 29 ++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
+
 diff --git a/tools/testing/selftests/net/psock_tpacket.c b/tools/testing/selftests/net/psock_tpacket.c
-index e795a41c4771..c50375f51b2e 100644
+index 4d5f317ab42c3..9696c9e484d54 100644
 --- a/tools/testing/selftests/net/psock_tpacket.c
 +++ b/tools/testing/selftests/net/psock_tpacket.c
-@@ -42,6 +42,7 @@
+@@ -28,6 +28,7 @@
  #include <sys/stat.h>
  #include <sys/socket.h>
  #include <sys/mman.h>
@@ -21,7 +31,7 @@ index e795a41c4771..c50375f51b2e 100644
  #include <linux/if_packet.h>
  #include <linux/filter.h>
  #include <ctype.h>
-@@ -844,9 +845,34 @@ static int test_tpacket(int version, int type)
+@@ -832,9 +833,34 @@ static int test_tpacket(int version, int type)
  	return 0;
  }
  
@@ -56,7 +66,7 @@ index e795a41c4771..c50375f51b2e 100644
  
  	ret |= test_tpacket(TPACKET_V1, PACKET_RX_RING);
  	ret |= test_tpacket(TPACKET_V1, PACKET_TX_RING);
-@@ -855,7 +881,8 @@ int main(void)
+@@ -843,7 +869,8 @@ int main(void)
  	ret |= test_tpacket(TPACKET_V2, PACKET_TX_RING);
  
  	ret |= test_tpacket(TPACKET_V3, PACKET_RX_RING);
@@ -66,3 +76,6 @@ index e795a41c4771..c50375f51b2e 100644
  
  	if (ret)
  		return 1;
+-- 
+2.36.0.550.gb090851708-goog
+

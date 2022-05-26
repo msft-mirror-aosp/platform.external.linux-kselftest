@@ -13,11 +13,13 @@
  * we need to use the kernel's siginfo.h file and trick glibc
  * into accepting it.
  */
+#if defined(__GLIBC_PREREQ)
 #if !__GLIBC_PREREQ(2, 26)
 # include <asm/siginfo.h>
 # define __have_siginfo_t 1
 # define __have_sigval_t 1
 # define __have_sigevent_t 1
+#endif
 #endif
 
 #include <errno.h>
@@ -565,6 +567,8 @@ TEST(empty_prog)
 	EXPECT_EQ(EINVAL, errno);
 }
 
+/* b/147676645 */
+#if 0
 TEST(log_all)
 {
 	struct sock_filter filter[] = {
@@ -586,6 +590,7 @@ TEST(log_all)
 	/* getppid() should succeed and be logged (no check for logging) */
 	EXPECT_EQ(parent, syscall(__NR_getppid));
 }
+#endif
 
 TEST_SIGNAL(unknown_ret_is_kill_inside, SIGSYS)
 {
@@ -848,6 +853,8 @@ void kill_thread_or_group(struct __test_metadata *_metadata,
 	exit(42);
 }
 
+/* b/147676645 */
+#if 0
 TEST(KILL_thread)
 {
 	int status;
@@ -866,6 +873,7 @@ TEST(KILL_thread)
 	ASSERT_TRUE(WIFEXITED(status));
 	ASSERT_EQ(42, WEXITSTATUS(status));
 }
+#endif
 
 TEST(KILL_process)
 {
@@ -1434,6 +1442,8 @@ TEST_F(precedence, trace_is_fourth_in_any_order)
 	EXPECT_EQ(-1, syscall(__NR_getpid));
 }
 
+/* b/147676645 */
+#if 0
 TEST_F(precedence, log_is_fifth)
 {
 	pid_t mypid, parent;
@@ -1453,6 +1463,7 @@ TEST_F(precedence, log_is_fifth)
 	/* Should also work just fine */
 	EXPECT_EQ(mypid, syscall(__NR_getpid));
 }
+#endif
 
 TEST_F(precedence, log_is_fifth_in_any_order)
 {
@@ -2230,6 +2241,11 @@ TEST_F_SIGNAL(TRACE_syscall, kill_immediate, SIGSYS)
 	EXPECT_EQ(-1, syscall(__NR_mknodat, -1, NULL, 0, 0));
 }
 
+/*
+ * TODO: b/33027081
+ * These tests do not work on kernels prior to 4.8.
+ */
+#ifndef __ANDROID__
 TEST_F(TRACE_syscall, skip_after)
 {
 	struct sock_filter filter[] = {
@@ -2277,6 +2293,7 @@ TEST_F_SIGNAL(TRACE_syscall, kill_after, SIGSYS)
 	/* Tracer will redirect getpid to getppid, and we should die. */
 	EXPECT_NE(self->mypid, syscall(__NR_getpid));
 }
+#endif
 
 TEST(seccomp_syscall)
 {
@@ -2366,6 +2383,8 @@ TEST(seccomp_syscall_mode_lock)
 	}
 }
 
+/* b/147676645 */
+#if 0
 /*
  * Test detection of known and unknown filter flags. Userspace needs to be able
  * to check if a filter flag is supported by the current kernel and a good way
@@ -2456,6 +2475,7 @@ TEST(detect_seccomp_filter_flags)
 		       flag);
 	}
 }
+#endif
 
 TEST(TSYNC_first)
 {
@@ -3014,6 +3034,7 @@ TEST(syscall_restart)
 	};
 #if defined(__arm__)
 	struct utsname utsbuf;
+	int arm_version;
 #endif
 
 	ASSERT_EQ(0, pipe(pipefd));
@@ -3129,12 +3150,12 @@ TEST(syscall_restart)
 	ret = get_syscall(_metadata, child_pid);
 #if defined(__arm__)
 	/*
-	 * FIXME:
 	 * - native ARM registers do NOT expose true syscall.
 	 * - compat ARM registers on ARM64 DO expose true syscall.
 	 */
 	ASSERT_EQ(0, uname(&utsbuf));
-	if (strncmp(utsbuf.machine, "arm", 3) == 0) {
+	if (sscanf(utsbuf.machine, "armv%d", &arm_version) == 1 &&
+	    arm_version < 8) {
 		EXPECT_EQ(__NR_nanosleep, ret);
 	} else
 #endif
@@ -3152,6 +3173,8 @@ TEST(syscall_restart)
 		_metadata->passed = 0;
 }
 
+/* b/147676645 */
+#if 0
 TEST_SIGNAL(filter_flag_log, SIGSYS)
 {
 	struct sock_filter allow_filter[] = {
@@ -3313,6 +3336,7 @@ TEST(get_metadata)
 skip:
 	ASSERT_EQ(0, kill(pid, SIGKILL));
 }
+#endif
 
 static int user_notif_syscall(int nr, unsigned int flags)
 {
