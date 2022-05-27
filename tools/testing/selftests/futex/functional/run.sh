@@ -21,7 +21,9 @@
 run_test()
 {
 	$@
-	if [ $? -ne 0 ]; then
+    ret=$?
+	if [ $ret -ne 0 ] && [ $ret -ne 4 ]; then  # KSFT_SKIP=4
+        echo "Failed with $ret"
 		rc=1
 	fi
 }
@@ -82,5 +84,14 @@ run_test ./futex_wait_wouldblock $COLOR
 echo
 run_test ./futex_wait_uninitialized_heap $COLOR
 run_test ./futex_wait_private_mapped_file $COLOR
+
+echo
+run_test ./futex_wait $COLOR
+
+echo
+run_test ./futex_requeue $COLOR
+
+echo
+run_test ./futex_waitv $COLOR
 
 exit $rc
