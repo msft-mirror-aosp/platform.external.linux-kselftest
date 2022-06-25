@@ -20,12 +20,12 @@
 
 run_test()
 {
-	$@
+    $@
     ret=$?
-	if [ $ret -ne 0 ] && [ $ret -ne 4 ]; then  # KSFT_SKIP=4
+    if [ $ret -ne 0 ] && [ $ret -ne 4 ]; then  # KSFT_SKIP=4
         echo "Failed with $ret"
-		rc=1
-	fi
+        rc=1
+    fi
 }
 
 # Test for a color capable console
@@ -85,13 +85,17 @@ echo
 run_test ./futex_wait_uninitialized_heap $COLOR
 run_test ./futex_wait_private_mapped_file $COLOR
 
-echo
-run_test ./futex_wait $COLOR
+# b/234151152
+# Disable because system v shared memory not available
+#echo
+#run_test ./futex_wait $COLOR
 
 echo
 run_test ./futex_requeue $COLOR
 
-echo
-run_test ./futex_waitv $COLOR
+# b/234151152
+# Disable because system v shared memory not available
+#echo
+#run_test ./futex_waitv $COLOR
 
 exit $rc
