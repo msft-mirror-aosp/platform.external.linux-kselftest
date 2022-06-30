@@ -76,7 +76,6 @@ cc_defaults {
         "-Wno-parentheses-equality",
         "-Wno-pointer-arith",
         "-Wno-sign-compare",
-        "-Wno-unused-parameter",
         "-Wno-shift-negative-value",
         "-Wno-switch",
         "-Wno-absolute-value",

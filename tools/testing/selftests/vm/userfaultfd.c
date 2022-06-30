@@ -665,7 +665,7 @@ static int userfaultfd_open(int features)
 		if (errno == ENOSYS) {
 			fprintf(stderr,
 				"userfaultfd syscall not available in this kernel\n");
-			exit(KSFT_PASS);
+			exit(KSFT_SKIP);
 		}
 		fprintf(stderr,
 			"userfaultfd syscall failed with errno: %d\n", errno);
