@@ -60,7 +60,7 @@ void *get_pi_lock(void *arg)
  */
 static void test_timeout(int res, int *ret, char *test_name, int err)
 {
-	if (!res || !(errno & err)) {
+	if (!res || errno != err) {
 		ksft_test_result_fail("%s returned %d\n", test_name,
 				      res < 0 ? errno : res);
 		*ret = RET_FAIL;
@@ -182,17 +182,20 @@ int main(int argc, char *argv[])
 	res = futex_lock_pi(&futex_pi, NULL, 0, FUTEX_CLOCK_REALTIME);
 	test_timeout(res, &ret, "futex_lock_pi invalid timeout flag", ENOSYS);
 
+/* b/234469895 futex_waitv not available */
+#ifndef __ANDROID__
 	/* futex_waitv with CLOCK_MONOTONIC */
 	if (futex_get_abs_timeout(CLOCK_MONOTONIC, &to, timeout_ns))
 		return RET_FAIL;
 	res = futex_waitv(&waitv, 1, 0, &to, CLOCK_MONOTONIC);
-	test_timeout(res, &ret, "futex_waitv monotonic", ETIMEDOUT | ENOSYS);
+	test_timeout(res, &ret, "futex_waitv monotonic", ETIMEDOUT);
 
 	/* futex_waitv with CLOCK_REALTIME */
 	if (futex_get_abs_timeout(CLOCK_REALTIME, &to, timeout_ns))
 		return RET_FAIL;
 	res = futex_waitv(&waitv, 1, 0, &to, CLOCK_REALTIME);
-	test_timeout(res, &ret, "futex_waitv realtime", ETIMEDOUT | ENOSYS);
+	test_timeout(res, &ret, "futex_waitv realtime", ETIMEDOUT);
+#endif
 
 	ksft_print_cnts();
 	return ret;
