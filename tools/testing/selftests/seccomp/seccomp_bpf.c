@@ -3003,6 +3003,12 @@ TEST_F(TSYNC, two_siblings_not_under_filter)
 	ASSERT_EQ(0, ret);  /* just us chickens */
 }
 
+/*
+ * b/242828400
+ * syscall_restart test is broken on 5.15 arm 32.
+ * SIGSTOP will not interrupt nanosleep.
+ */
+#if !defined(__ANDROID__) && !defined(__arm__)
 /* Make sure restarted syscalls are seen directly as "restart_syscall". */
 TEST(syscall_restart)
 {
@@ -3179,6 +3185,7 @@ TEST(syscall_restart)
 	if (WIFSIGNALED(status) || WEXITSTATUS(status))
 		_metadata->passed = 0;
 }
+#endif
 
 TEST_SIGNAL(filter_flag_log, SIGSYS)
 {
