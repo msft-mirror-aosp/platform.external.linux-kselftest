@@ -1,0 +1,43 @@
+From abbf2da62c0dd4a4a554a48f8b32c8ad7e2bdfbb Mon Sep 17 00:00:00 2001
+From: Edward Liaw <edliaw@google.com>
+Date: Tue, 20 Sep 2022 17:52:01 +0000
+Subject: [PATCH] seccomp_bpf: disable restart_syscall
+
+SIGSTOP does not interrupt nanosleep on 5.15 on arm 32.
+
+Bug: 242828400
+Test: atest -a vts_linux_kselftest_arm_32:seccomp_seccomp_bpf_arm_32#seccomp_seccomp_bpf_arm_32
+Signed-off-by: Edward Liaw <edliaw@google.com>
+Change-Id: I87afb13ccc3fa4d9fd386807f810dc677a28b523
+---
+ tools/testing/selftests/seccomp/seccomp_bpf.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/tools/testing/selftests/seccomp/seccomp_bpf.c b/tools/testing/selftests/seccomp/seccomp_bpf.c
+index fce11f729f36e..cc7dff2671a74 100644
+--- a/tools/testing/selftests/seccomp/seccomp_bpf.c
++++ b/tools/testing/selftests/seccomp/seccomp_bpf.c
+@@ -3003,6 +3003,12 @@ TEST_F(TSYNC, two_siblings_not_under_filter)
+ 	ASSERT_EQ(0, ret);  /* just us chickens */
+ }
+ 
++/*
++ * b/242828400
++ * syscall_restart test is broken on 5.15 arm 32.
++ * SIGSTOP will not interrupt nanosleep.
++ */
++#if !defined(__ANDROID__) && !defined(__arm__)
+ /* Make sure restarted syscalls are seen directly as "restart_syscall". */
+ TEST(syscall_restart)
+ {
+@@ -3179,6 +3185,7 @@ TEST(syscall_restart)
+ 	if (WIFSIGNALED(status) || WEXITSTATUS(status))
+ 		_metadata->passed = 0;
+ }
++#endif
+ 
+ TEST_SIGNAL(filter_flag_log, SIGSYS)
+ {
+-- 
+2.37.3.998.g577e59143f-goog
+
