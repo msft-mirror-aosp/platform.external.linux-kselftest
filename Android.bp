@@ -121,6 +121,9 @@ cc_test {
         arm: {
             enabled: false,
         },
+        riscv64: {
+            enabled: false,
+        },
         arm64: {
             srcs: [
                 "tools/testing/selftests/breakpoints/breakpoint_test_arm64.c",
@@ -737,6 +740,9 @@ cc_test {
                 "libdl",
             ],
         },
+        riscv64: {
+            enabled: false,
+        },
     },
     cflags: [
         "-O2",
@@ -766,6 +772,9 @@ cc_test {
         },
         x86_64: {
             enabled: true,
+        },
+        riscv64: {
+            enabled: false,
         },
     },
     cflags: [
@@ -838,6 +847,9 @@ cc_test {
                 "tools/testing/selftests/x86/thunks.S",
             ],
         },
+        riscv64: {
+            enabled: false,
+        },
     },
 }
 
@@ -861,6 +873,9 @@ cc_test {
     arch: {
         x86: {
             enabled: true,
+        },
+        riscv64: {
+            enabled: false,
         },
     },
 }
