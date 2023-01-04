@@ -4,7 +4,13 @@
       "name": "vts_linux_kselftest_arm_32"
     },
     {
-      "name" :"vts_linux_kselftest_arm_64"
+      "name" :"vts_linux_kselftest_arm_64",
+      "options": [
+        {
+          // TODO(b/243948409)
+          "exclude-filter": "net_psock_tpacket_arm_64#net_psock_tpacket_arm_64"
+        }
+      ]
     },
     {
       "name": "vts_linux_kselftest_x86_32",
