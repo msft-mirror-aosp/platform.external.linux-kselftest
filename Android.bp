@@ -93,6 +93,12 @@ cc_defaults {
     no_named_install_directory: true,
 
     test_per_src: true,
+
+    // FIXME: test fails to build with LTO
+    // http://b/241723066
+    lto: {
+        never: true,
+    },
 }
 
 // binderfs test
@@ -113,6 +119,9 @@ cc_test {
     defaults: ["kselftest_defaults"],
     arch: {
         arm: {
+            enabled: false,
+        },
+        riscv64: {
             enabled: false,
         },
         arm64: {
@@ -662,6 +671,8 @@ cc_test {
         "tools/testing/selftests/vm/mlock-random-test.c",
         "tools/testing/selftests/vm/mlock2-tests.c",
         "tools/testing/selftests/vm/on-fault-limit.c",
+        "tools/testing/selftests/vm/mremap_dontunmap.c",
+        "tools/testing/selftests/vm/mremap_test.c",
         "tools/testing/selftests/vm/userfaultfd.c",
         "tools/testing/selftests/vm/thuge-gen.c",
         "tools/testing/selftests/vm/transhuge-stress.c",
@@ -731,6 +742,9 @@ cc_test {
                 "libdl",
             ],
         },
+        riscv64: {
+            enabled: false,
+        },
     },
     cflags: [
         "-O2",
@@ -760,6 +774,9 @@ cc_test {
         },
         x86_64: {
             enabled: true,
+        },
+        riscv64: {
+            enabled: false,
         },
     },
     cflags: [
@@ -832,6 +849,9 @@ cc_test {
                 "tools/testing/selftests/x86/thunks.S",
             ],
         },
+        riscv64: {
+            enabled: false,
+        },
     },
 }
 
@@ -855,6 +875,9 @@ cc_test {
     arch: {
         x86: {
             enabled: true,
+        },
+        riscv64: {
+            enabled: false,
         },
     },
 }
