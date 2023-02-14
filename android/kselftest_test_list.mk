@@ -61,6 +61,8 @@ kselftest_modules += \
   kselftest_vdso_test_gettimeofday \
   kselftest_vm_tests_mlock2-tests \
   kselftest_vm_tests_on-fault-limit \
+  kselftest_vm_tests_mremap_dontunmap \
+  kselftest_vm_tests_mremap_test \
   kselftest_vm_tests_userfaultfd \
   kselftest_vm64_tests_virtual_address_range \
   kselftest_x86_ptrace_syscall \
