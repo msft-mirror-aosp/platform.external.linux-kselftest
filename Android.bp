@@ -914,3 +914,11 @@ sh_test {
     filename_from_src: true,
     compile_multilib: "both",
 }
+
+// NFC - NCI test
+cc_test {
+    name: "kselftest_nci_tests",
+    relative_install_path: "linux-kselftest/nci",
+    srcs: ["tools/testing/selftests/nci/nci_dev.c"],
+    defaults: ["kselftest_defaults"],
+}
