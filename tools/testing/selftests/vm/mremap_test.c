@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
+#include <sys/utsname.h>
 #include <time.h>
 
 #include "../kselftest.h"
@@ -21,6 +22,24 @@
 #define VALIDATION_NO_THRESHOLD 0	/* Verify the entire region */
 
 #define MIN(X, Y) ((X) < (Y) ? (X) : (Y))
+
+#define MIN_KERNEL_MAJOR_VERSION 5
+int KERNEL_MAJOR_VERSION = 0;
+int page_size = 4096;
+
+void kernel_major_version(void)
+{
+	struct utsname uname_st;
+	char *token;
+	int version;
+
+	uname(&uname_st);
+	token = strtok(uname_st.release, ".");
+	version = atoi(token);
+
+	if (version)
+		KERNEL_MAJOR_VERSION = version;
+}
 
 struct config {
 	unsigned long long src_alignment;
@@ -118,6 +137,13 @@ static long long remap_region(struct config c, unsigned int threshold_mb,
 	else
 		threshold = MIN(threshold_mb * _1MB, c.region_size);
 
+	/* Not supported in this kernel version. */
+	if ((KERNEL_MAJOR_VERSION < MIN_KERNEL_MAJOR_VERSION)
+		&& (c.src_alignment & (PTE - 1))) {
+		ret = 0;
+		goto out;
+	}
+
 	src_addr = get_source_mapping(c);
 	if (!src_addr) {
 		ret = -1;
@@ -191,6 +217,12 @@ static void run_mremap_test_case(struct test test_case, int *failures,
 	long long remap_time = remap_region(test_case.config, threshold_mb,
 					    pattern_seed);
 
+	if (!remap_time) {
+		ksft_test_result_skip("%s\n\tSkipping - Unsupported kernel version\n",
+							  test_case.name);
+		return;
+	}
+
 	if (remap_time < 0) {
 		if (test_case.expect_failure)
 			ksft_test_result_pass("%s\n\tExpected mremap failure\n",
@@ -263,8 +295,9 @@ int main(int argc, char **argv)
 	unsigned int pattern_seed;
 	struct test test_cases[MAX_TEST];
 	struct test perf_test_cases[MAX_PERF_TEST];
-	int page_size;
 	time_t t;
+
+	kernel_major_version();
 
 	pattern_seed = (unsigned int) time(&t);
 
