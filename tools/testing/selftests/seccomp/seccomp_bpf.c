@@ -2175,6 +2175,9 @@ FIXTURE_TEARDOWN(TRACE_syscall)
 
 TEST(negative_ENOSYS)
 {
+#if defined(__arm__)
+	SKIP(return, "arm32 does not handle negative syscalls");
+#endif
 	/*
 	 * There should be no difference between an "internal" skip
 	 * and userspace asking for syscall "-1".
