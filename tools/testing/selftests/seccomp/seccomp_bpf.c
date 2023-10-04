@@ -2175,6 +2175,9 @@ FIXTURE_TEARDOWN(TRACE_syscall)
 
 TEST(negative_ENOSYS)
 {
+#if defined(__arm__)
+	SKIP(return, "arm32 does not support calling syscall -1");
+#endif
 	/*
 	 * There should be no difference between an "internal" skip
 	 * and userspace asking for syscall "-1".
@@ -3079,7 +3082,8 @@ TEST(syscall_restart)
 		timeout.tv_sec = 1;
 		errno = 0;
 		EXPECT_EQ(0, nanosleep(&timeout, NULL)) {
-			TH_LOG("Call to nanosleep() failed (errno %d)", errno);
+			TH_LOG("Call to nanosleep() failed (errno %d: %s)",
+				errno, strerror(errno));
 		}
 
 		/* Read final sync from parent. */
@@ -3987,6 +3991,9 @@ TEST(user_notification_filter_empty)
 		TH_LOG("Kernel does not support PR_SET_NO_NEW_PRIVS!");
 	}
 
+	if (__NR_clone3 < 0)
+		SKIP(return, "Test not built with clone3 support");
+
 	pid = sys_clone3(&args, sizeof(args));
 	ASSERT_GE(pid, 0);
 
@@ -4046,6 +4053,9 @@ TEST(user_notification_filter_empty_threaded)
 	ASSERT_EQ(0, ret) {
 		TH_LOG("Kernel does not support PR_SET_NO_NEW_PRIVS!");
 	}
+
+	if (__NR_clone3 < 0)
+		SKIP(return, "Test not built with clone3 support");
 
 	pid = sys_clone3(&args, sizeof(args));
 	ASSERT_GE(pid, 0);
