@@ -62,10 +62,66 @@ license {
 sh_test {
     name: "vts_linux_kselftest_arm_64",
     src: "android/empty.sh",
-    sub_dir: "vts_linux_kselftest",
     test_suites: [
         "general-tests",
         "vts"
+    ],
+    data: [
+        ":kselftest_binderfs_tests_binderfs_test",
+        ":kselftest_capabilities_test_execve",
+        ":kselftest_capabilities_validate_cap",
+        ":kselftest_futex_tests_futex_requeue_pi_mismatched_ops",
+        ":kselftest_futex_tests_futex_requeue_pi_signal_restart",
+        ":kselftest_futex_tests_futex_requeue_pi",
+        ":kselftest_futex_tests_futex_requeue",
+        ":kselftest_futex_tests_futex_wait_private_mapped_file",
+        ":kselftest_futex_tests_futex_wait_timeout",
+        ":kselftest_futex_tests_futex_wait_uninitialized_heap",
+        ":kselftest_futex_tests_futex_wait_wouldblock",
+        ":kselftest_futex_tests_futex_wait",
+        ":kselftest_futex_tests_futex_waitv",
+        ":kselftest_futex_functional_run.sh",
+        ":kselftest_kcmp_tests_kcmp_test",
+        ":kselftest_net_tests_socket",
+        ":kselftest_net_tests_psock_fanout",
+        ":kselftest_net_tests_psock_tpacket",
+        ":kselftest_net_tests_reuseport_dualstack",
+        ":kselftest_net_tests_reuseaddr_conflict",
+        ":kselftest_net_test_bpf",
+        ":kselftest_ptrace_tests_peeksiginfo",
+        ":kselftest_rtc_tests_rtctest",
+        ":kselftest_seccomp_tests_seccomp_bpf",
+        ":kselftest_size_test_get_size",
+        ":kselftest_splice_test_default_file_splice_read",
+        ":kselftest_splice_default_file_splice_read.sh",
+        ":kselftest_timer_tests_inconsistency-check",
+        ":kselftest_timer_tests_nanosleep",
+        ":kselftest_timer_tests_nsleep-lat",
+        ":kselftest_timer_tests_posix_timers",
+        ":kselftest_timer_tests_raw_skew",
+        ":kselftest_timer_tests_set-tai",
+        ":kselftest_timer_tests_set-timer-lat",
+        ":kselftest_timer_tests_threadtest",
+        ":kselftest_timer_tests_valid-adjtimex",
+        ":kselftest_vm_tests_compaction_test",
+        ":kselftest_vm_tests_hugepage-mmap",
+        ":kselftest_vm_tests_hugepage-shm",
+        ":kselftest_vm_tests_map_hugetlb",
+        ":kselftest_vm_tests_mlock-random-test",
+        ":kselftest_vm_tests_mlock2-tests",
+        ":kselftest_vm_tests_on-fault-limit",
+        ":kselftest_vm_tests_mremap_dontunmap",
+        ":kselftest_vm_tests_mremap_test",
+        ":kselftest_vm_tests_userfaultfd",
+        ":kselftest_vm_tests_thuge-gen",
+        ":kselftest_vm_tests_transhuge-stress",
+        ":kselftest_vm_run_vmtests",
+        ":kselftest_breakpoints_breakpoint_test",
+        ":kselftest_kvm_arm64_tests_pvm_wipe_mem",
+        ":kselftest_vdso_test_abi",
+        ":kselftest_vdso_test_clock_getres",
+        ":kselftest_vdso_test_getcpu",
+        ":kselftest_vdso_test_gettimeofday",
     ],
     enabled: false,
     arch: {
@@ -79,13 +135,67 @@ sh_test {
 sh_test {
     name: "vts_linux_kselftest_arm_32",
     src: "android/empty.sh",
-    sub_dir: "vts_linux_kselftest",
     test_suites: [
         "general-tests",
         "vts"
     ],
+    data: [
+        ":kselftest_binderfs_tests_binderfs_test",
+        ":kselftest_capabilities_test_execve",
+        ":kselftest_capabilities_validate_cap",
+        ":kselftest_futex_tests_futex_requeue_pi_mismatched_ops",
+        ":kselftest_futex_tests_futex_requeue_pi_signal_restart",
+        ":kselftest_futex_tests_futex_requeue_pi",
+        ":kselftest_futex_tests_futex_requeue",
+        ":kselftest_futex_tests_futex_wait_private_mapped_file",
+        ":kselftest_futex_tests_futex_wait_timeout",
+        ":kselftest_futex_tests_futex_wait_uninitialized_heap",
+        ":kselftest_futex_tests_futex_wait_wouldblock",
+        ":kselftest_futex_tests_futex_wait",
+        ":kselftest_futex_tests_futex_waitv",
+        ":kselftest_futex_functional_run.sh",
+        ":kselftest_kcmp_tests_kcmp_test",
+        ":kselftest_net_tests_socket",
+        ":kselftest_net_tests_psock_fanout",
+        ":kselftest_net_tests_psock_tpacket",
+        ":kselftest_net_tests_reuseport_dualstack",
+        ":kselftest_net_tests_reuseaddr_conflict",
+        ":kselftest_net_test_bpf",
+        ":kselftest_ptrace_tests_peeksiginfo",
+        ":kselftest_rtc_tests_rtctest",
+        ":kselftest_seccomp_tests_seccomp_bpf",
+        ":kselftest_size_test_get_size",
+        ":kselftest_splice_test_default_file_splice_read",
+        ":kselftest_splice_default_file_splice_read.sh",
+        ":kselftest_timer_tests_inconsistency-check",
+        ":kselftest_timer_tests_nanosleep",
+        ":kselftest_timer_tests_nsleep-lat",
+        ":kselftest_timer_tests_posix_timers",
+        ":kselftest_timer_tests_raw_skew",
+        ":kselftest_timer_tests_set-tai",
+        ":kselftest_timer_tests_set-timer-lat",
+        ":kselftest_timer_tests_threadtest",
+        ":kselftest_timer_tests_valid-adjtimex",
+        ":kselftest_vm_tests_compaction_test",
+        ":kselftest_vm_tests_hugepage-mmap",
+        ":kselftest_vm_tests_hugepage-shm",
+        ":kselftest_vm_tests_map_hugetlb",
+        ":kselftest_vm_tests_mlock-random-test",
+        ":kselftest_vm_tests_mlock2-tests",
+        ":kselftest_vm_tests_on-fault-limit",
+        ":kselftest_vm_tests_mremap_dontunmap",
+        ":kselftest_vm_tests_mremap_test",
+        ":kselftest_vm_tests_userfaultfd",
+        ":kselftest_vm_tests_thuge-gen",
+        ":kselftest_vm_tests_transhuge-stress",
+        ":kselftest_vm_run_vmtests",
+    ],
+    compile_multilib: "32",
     enabled: false,
     arch: {
+        arm64: {
+            enabled: true,
+        },
         arm: {
             enabled: true,
         },
@@ -96,10 +206,70 @@ sh_test {
 sh_test {
     name: "vts_linux_kselftest_x86_64",
     src: "android/empty.sh",
-    sub_dir: "vts_linux_kselftest",
     test_suites: [
         "general-tests",
         "vts"
+    ],
+    data: [
+        ":kselftest_binderfs_tests_binderfs_test",
+        ":kselftest_capabilities_test_execve",
+        ":kselftest_capabilities_validate_cap",
+        ":kselftest_futex_tests_futex_requeue_pi_mismatched_ops",
+        ":kselftest_futex_tests_futex_requeue_pi_signal_restart",
+        ":kselftest_futex_tests_futex_requeue_pi",
+        ":kselftest_futex_tests_futex_requeue",
+        ":kselftest_futex_tests_futex_wait_private_mapped_file",
+        ":kselftest_futex_tests_futex_wait_timeout",
+        ":kselftest_futex_tests_futex_wait_uninitialized_heap",
+        ":kselftest_futex_tests_futex_wait_wouldblock",
+        ":kselftest_futex_tests_futex_wait",
+        ":kselftest_futex_tests_futex_waitv",
+        ":kselftest_futex_functional_run.sh",
+        ":kselftest_kcmp_tests_kcmp_test",
+        ":kselftest_net_tests_socket",
+        ":kselftest_net_tests_psock_fanout",
+        ":kselftest_net_tests_psock_tpacket",
+        ":kselftest_net_tests_reuseport_dualstack",
+        ":kselftest_net_tests_reuseaddr_conflict",
+        ":kselftest_net_test_bpf",
+        ":kselftest_ptrace_tests_peeksiginfo",
+        ":kselftest_rtc_tests_rtctest",
+        ":kselftest_seccomp_tests_seccomp_bpf",
+        ":kselftest_size_test_get_size",
+        ":kselftest_splice_test_default_file_splice_read",
+        ":kselftest_splice_default_file_splice_read.sh",
+        ":kselftest_timer_tests_inconsistency-check",
+        ":kselftest_timer_tests_nanosleep",
+        ":kselftest_timer_tests_nsleep-lat",
+        ":kselftest_timer_tests_posix_timers",
+        ":kselftest_timer_tests_raw_skew",
+        ":kselftest_timer_tests_set-tai",
+        ":kselftest_timer_tests_set-timer-lat",
+        ":kselftest_timer_tests_threadtest",
+        ":kselftest_timer_tests_valid-adjtimex",
+        ":kselftest_vm_tests_compaction_test",
+        ":kselftest_vm_tests_hugepage-mmap",
+        ":kselftest_vm_tests_hugepage-shm",
+        ":kselftest_vm_tests_map_hugetlb",
+        ":kselftest_vm_tests_mlock-random-test",
+        ":kselftest_vm_tests_mlock2-tests",
+        ":kselftest_vm_tests_on-fault-limit",
+        ":kselftest_vm_tests_mremap_dontunmap",
+        ":kselftest_vm_tests_mremap_test",
+        ":kselftest_vm_tests_userfaultfd",
+        ":kselftest_vm_tests_thuge-gen",
+        ":kselftest_vm_tests_transhuge-stress",
+        ":kselftest_vm_run_vmtests",
+        ":kselftest_vdso_test_abi",
+        ":kselftest_vdso_test_clock_getres",
+        ":kselftest_vdso_test_getcpu",
+        ":kselftest_vdso_test_gettimeofday",
+        ":kselftest_x86_tests_single_step_syscall",
+        ":kselftest_x86_tests_syscall_nt",
+        ":kselftest_x86_ptrace_syscall",
+        ":kselftest_x86_tests_test_mremap_vdso",
+        ":kselftest_x86_check_initial_reg_state",
+        ":kselftest_x86_tests_ldt_gdt",
     ],
     enabled: false,
     arch: {
@@ -113,14 +283,81 @@ sh_test {
 sh_test {
     name: "vts_linux_kselftest_x86_32",
     src: "android/empty.sh",
-    sub_dir: "vts_linux_kselftest",
     test_suites: [
         "general-tests",
         "vts"
     ],
+    data: [
+        ":kselftest_binderfs_tests_binderfs_test",
+        ":kselftest_capabilities_test_execve",
+        ":kselftest_capabilities_validate_cap",
+        ":kselftest_futex_tests_futex_requeue_pi_mismatched_ops",
+        ":kselftest_futex_tests_futex_requeue_pi_signal_restart",
+        ":kselftest_futex_tests_futex_requeue_pi",
+        ":kselftest_futex_tests_futex_requeue",
+        ":kselftest_futex_tests_futex_wait_private_mapped_file",
+        ":kselftest_futex_tests_futex_wait_timeout",
+        ":kselftest_futex_tests_futex_wait_uninitialized_heap",
+        ":kselftest_futex_tests_futex_wait_wouldblock",
+        ":kselftest_futex_tests_futex_wait",
+        ":kselftest_futex_tests_futex_waitv",
+        ":kselftest_futex_functional_run.sh",
+        ":kselftest_kcmp_tests_kcmp_test",
+        ":kselftest_net_tests_socket",
+        ":kselftest_net_tests_psock_fanout",
+        ":kselftest_net_tests_psock_tpacket",
+        ":kselftest_net_tests_reuseport_dualstack",
+        ":kselftest_net_tests_reuseaddr_conflict",
+        ":kselftest_net_test_bpf",
+        ":kselftest_rtc_tests_rtctest",
+        ":kselftest_seccomp_tests_seccomp_bpf",
+        ":kselftest_size_test_get_size",
+        ":kselftest_splice_test_default_file_splice_read",
+        ":kselftest_splice_default_file_splice_read.sh",
+        ":kselftest_timer_tests_inconsistency-check",
+        ":kselftest_timer_tests_nanosleep",
+        ":kselftest_timer_tests_nsleep-lat",
+        ":kselftest_timer_tests_posix_timers",
+        ":kselftest_timer_tests_raw_skew",
+        ":kselftest_timer_tests_set-tai",
+        ":kselftest_timer_tests_set-timer-lat",
+        ":kselftest_timer_tests_threadtest",
+        ":kselftest_timer_tests_valid-adjtimex",
+        ":kselftest_vm_tests_compaction_test",
+        ":kselftest_vm_tests_hugepage-mmap",
+        ":kselftest_vm_tests_hugepage-shm",
+        ":kselftest_vm_tests_map_hugetlb",
+        ":kselftest_vm_tests_mlock-random-test",
+        ":kselftest_vm_tests_mlock2-tests",
+        ":kselftest_vm_tests_on-fault-limit",
+        ":kselftest_vm_tests_mremap_dontunmap",
+        ":kselftest_vm_tests_mremap_test",
+        ":kselftest_vm_tests_userfaultfd",
+        ":kselftest_vm_tests_thuge-gen",
+        ":kselftest_vm_tests_transhuge-stress",
+        ":kselftest_vm_run_vmtests",
+        ":kselftest_x86_tests_single_step_syscall",
+        ":kselftest_x86_test_sysret_ss_attrs",
+        ":kselftest_x86_tests_syscall_nt",
+        ":kselftest_x86_ptrace_syscall",
+        ":kselftest_x86_tests_test_mremap_vdso",
+        ":kselftest_x86_check_initial_reg_state",
+        ":kselftest_x86_tests_ldt_gdt",
+        ":kselftest_x86_tests_syscall_arg_fault",
+        ":kselftest_x86_test_syscall_vdso",
+        ":kselftest_x86_tests_unwind_vdso",
+        ":kselftest_x86_tests_test_FCMOV",
+        ":kselftest_x86_tests_test_FCOMI",
+        ":kselftest_x86_tests_test_FISTTP",
+        ":kselftest_x86_tests_vdso_restorer",
+    ],
+    compile_multilib: "32",
     enabled: false,
     arch: {
         x86: {
+            enabled: true,
+        },
+        x86_64: {
             enabled: true,
         },
     },
@@ -130,10 +367,37 @@ sh_test {
 sh_test {
     name: "vts_linux_kselftest_riscv_64",
     src: "android/empty.sh",
-    sub_dir: "vts_linux_kselftest",
     test_suites: [
         "general-tests",
         "vts"
+    ],
+    data: [
+        ":kselftest_capabilities_test_execve",
+        ":kselftest_capabilities_validate_cap",
+        ":kselftest_futex_tests_futex_requeue_pi_mismatched_ops",
+        ":kselftest_kcmp_tests_kcmp_test",
+        ":kselftest_net_tests_socket",
+        ":kselftest_net_tests_psock_fanout",
+        ":kselftest_net_tests_psock_tpacket",
+        ":kselftest_net_tests_reuseport_dualstack",
+        ":kselftest_net_tests_reuseaddr_conflict",
+        ":kselftest_net_test_bpf",
+        ":kselftest_ptrace_tests_peeksiginfo",
+        ":kselftest_rtc_tests_rtctest",
+        ":kselftest_seccomp_tests_seccomp_bpf",
+        ":kselftest_size_test_get_size",
+        ":kselftest_splice_test_default_file_splice_read",
+        ":kselftest_splice_default_file_splice_read.sh",
+        ":kselftest_timer_tests_inconsistency-check",
+        ":kselftest_timer_tests_nanosleep",
+        ":kselftest_timer_tests_nsleep-lat",
+        ":kselftest_timer_tests_posix_timers",
+        ":kselftest_timer_tests_raw_skew",
+        ":kselftest_timer_tests_set-tai",
+        ":kselftest_timer_tests_set-timer-lat",
+        ":kselftest_timer_tests_threadtest",
+        ":kselftest_timer_tests_valid-adjtimex",
+        ":kselftest_vdso_test_abi",
     ],
     enabled: false,
     arch: {
@@ -142,6 +406,13 @@ sh_test {
         },
     },
     test_config_template: "android/vts_linux_kselftest_riscv_64.xml",
+}
+
+filegroup {
+    name: "kselftest_template",
+    srcs: [
+        "android/kselftest_template.xml",
+    ],
 }
 
 cc_defaults {
@@ -192,6 +463,7 @@ cc_defaults {
     //    "general-tests",
     //    "vts"
     //],
+    //test_config_template: ":kselftest_template",
 }
 
 // binderfs test
@@ -233,6 +505,12 @@ cc_test {
     defaults: ["kselftest_template_defaults"],
     enabled: false,
     arch: {
+        arm64: {
+            enabled: true,
+            srcs: [
+                "tools/testing/selftests/breakpoints/breakpoint_test_arm64.c",
+            ],
+        },
         x86: {
             enabled: true,
             srcs: [
@@ -243,22 +521,6 @@ cc_test {
             enabled: true,
             srcs: [
                 "tools/testing/selftests/breakpoints/breakpoint_test.c",
-            ],
-        },
-    },
-}
-
-cc_test {
-    name: "kselftest_breakpoints_breakpoint_test_arm64",
-    stem: "breakpoint_test_arm64",
-    relative_install_path: "linux-kselftest/breakpoints",
-    defaults: ["kselftest_defaults"],
-    enabled: false,
-    arch: {
-        arm64: {
-            enabled: true,
-            srcs: [
-                "tools/testing/selftests/breakpoints/breakpoint_test_arm64.c",
             ],
         },
     },
@@ -331,7 +593,7 @@ sh_test {
 // Exec test
 cc_test {
     name: "kselftest_exec_test_execveat",
-    //stem: "execveat",
+    stem: "execveat",
     relative_install_path: "vts_linux_kselftest/exec",
     srcs: [
         "tools/testing/selftests/exec/execveat.c",
@@ -341,7 +603,7 @@ cc_test {
 
 sh_test {
     name: "kselftest_exec_execveat.sh",
-    //sub_dir: "vts_linux_kselftest/exec",
+    sub_dir: "vts_linux_kselftest/exec",
     src: "tools/testing/selftests/exec/execveat.sh",
     //data: [
     //    ":kselftest_exec_test_execveat",
@@ -639,6 +901,7 @@ sh_test {
     //    ":kselftest_futex_tests_futex_wait",
     //    ":kselftest_futex_tests_futex_waitv",
     //],
+    //test_config_template: ":kselftest_template",
 }
 
 // intel_pstate test
@@ -670,14 +933,15 @@ cc_test {
 
 sh_test {
     name: "kselftest_intel_pstate_run.sh",
-    //sub_dir: "vts_linux_kselftest/intel_pstate",
+    sub_dir: "vts_linux_kselftest/intel_pstate",
     src: "tools/testing/selftests/intel_pstate/run.sh",
-    //filename_from_src: true,
+    filename_from_src: true,
     compile_multilib: "both",
     //data: [
     //    ":kselftest_intel_pstate_tests_aperf",
     //    ":kselftest_intel_pstate_tests_msr",
     //],
+    //test_config_template: ":kselftest_template",
 }
 
 // Kcmp test
@@ -869,6 +1133,7 @@ sh_test {
     //    ":kselftest_net_tests_reuseport_dualstack",
     //    ":kselftest_net_tests_reuseaddr_conflict",
     //],
+    //test_config_template: ":kselftest_template",
 }
 
 // Pstore test
@@ -966,6 +1231,7 @@ sh_test {
     //data: [
     //    ":kselftest_splice_test_default_file_splice_read",
     //],
+    //test_config_template: ":kselftest_template",
 }
 
 // Static keys test
@@ -1478,6 +1744,7 @@ sh_test {
     //    ":kselftest_vm_tests_userfaultfd",
     //    ":kselftest_vm_tests_thuge-gen",
     //],
+    //test_config_template: ":kselftest_template",
 }
 
 // x86 tests
