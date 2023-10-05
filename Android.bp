@@ -1193,6 +1193,9 @@ cc_test {
     stem: "seccomp_bpf",
     relative_install_path: "vts_linux_kselftest/seccomp",
     srcs: ["tools/testing/selftests/seccomp/seccomp_bpf.c"],
+    static_libs: [
+        "libcap",
+    ],
     defaults: ["kselftest_template_defaults"],
 }
 
