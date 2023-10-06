@@ -1196,6 +1196,9 @@ cc_test {
     static_libs: [
         "libcap",
     ],
+    cflags: [
+        "-Wno-unused-function",
+    ],
     defaults: ["kselftest_template_defaults"],
 }
 
