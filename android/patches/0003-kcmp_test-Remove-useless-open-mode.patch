@@ -1,7 +1,7 @@
-From 7edbca043da158b1335bc5cc010334244433db2f Mon Sep 17 00:00:00 2001
+From e75167b426e722ebd11623ae50891d321d245b59 Mon Sep 17 00:00:00 2001
 From: George Burgess IV <gbiv@google.com>
 Date: Mon, 31 Jul 2017 13:55:52 -0700
-Subject: [PATCH 04/24] Remove useless open mode
+Subject: [PATCH 03/20] kcmp_test: Remove useless open mode
 
 Open modes are ignored if the user doesn't want the file to be created:
 http://man7.org/linux/man-pages/man2/open.2.html
@@ -19,12 +19,12 @@ Test: mma. New warning no longer appears.
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tools/testing/selftests/kcmp/kcmp_test.c b/tools/testing/selftests/kcmp/kcmp_test.c
-index 6ea7b9f37a411..1ad60fce802d5 100644
+index 25110c7c0b3e..d7a8e321bb16 100644
 --- a/tools/testing/selftests/kcmp/kcmp_test.c
 +++ b/tools/testing/selftests/kcmp/kcmp_test.c
-@@ -88,7 +88,7 @@ int main(int argc, char **argv)
- 		int pid2 = getpid();
- 		int ret;
+@@ -91,7 +91,7 @@ int main(int argc, char **argv)
+ 		ksft_print_header();
+ 		ksft_set_plan(3);
  
 -		fd2 = open(kpath, O_RDWR, 0644);
 +		fd2 = open(kpath, O_RDWR);
@@ -32,5 +32,5 @@ index 6ea7b9f37a411..1ad60fce802d5 100644
  			perror("Can't open file");
  			ksft_exit_fail();
 -- 
-2.36.0.550.gb090851708-goog
+2.42.0.609.gbb76f46606-goog
 

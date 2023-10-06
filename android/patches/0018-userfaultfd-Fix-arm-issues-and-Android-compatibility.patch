@@ -1,7 +1,7 @@
-From 6387912710bf3762635e5bd6ddb4be59f50d9b78 Mon Sep 17 00:00:00 2001
+From 3fce534596d950ce2524275e90eaf9c949a81423 Mon Sep 17 00:00:00 2001
 From: Edward Liaw <edliaw@google.com>
 Date: Wed, 20 Apr 2022 00:29:06 +0000
-Subject: [PATCH 16/24] userfaultfd
+Subject: [PATCH 18/20] userfaultfd: Fix arm issues and Android compatibility
 
 Fix ARM related issues in userfaultfd selftest
 
@@ -38,42 +38,26 @@ Bug: 160737021
 Bug: 169683130
 Test: treehugger
 ---
- tools/testing/selftests/vm/userfaultfd.c | 74 ++++++++++++++++++++++--
- 1 file changed, 69 insertions(+), 5 deletions(-)
+ tools/testing/selftests/vm/userfaultfd.c | 57 ++++++++++++++++++++++--
+ 1 file changed, 53 insertions(+), 4 deletions(-)
 
 diff --git a/tools/testing/selftests/vm/userfaultfd.c b/tools/testing/selftests/vm/userfaultfd.c
-index 3fc1d2ee29485..e7a79f120cbde 100644
+index 297f250c1d95..28230a57fedd 100644
 --- a/tools/testing/selftests/vm/userfaultfd.c
 +++ b/tools/testing/selftests/vm/userfaultfd.c
-@@ -93,9 +93,11 @@ static char *huge_fd_off0;
+@@ -100,9 +100,11 @@ static int huge_fd;
  static unsigned long long *count_verify;
  static int uffd = -1;
  static int uffd_flags, finished, *pipefd;
 +static volatile bool ready_for_fork;
- static char *area_src, *area_src_alias, *area_dst, *area_dst_alias;
+ static char *area_src, *area_src_alias, *area_dst, *area_dst_alias, *area_remap;
  static char *zeropage;
  pthread_attr_t attr;
 +pthread_key_t long_jmp_key;
+ static bool test_collapse;
  
  /* Userfaultfd test statistics */
- struct uffd_stats {
-@@ -377,8 +379,13 @@ static void userfaultfd_open(uint64_t *features)
- 	struct uffdio_api uffdio_api;
- 
- 	uffd = syscall(__NR_userfaultfd, O_CLOEXEC | O_NONBLOCK | UFFD_USER_MODE_ONLY);
--	if (uffd < 0)
--		err("userfaultfd syscall not available in this kernel");
-+	if (uffd < 0) {
-+		if (errno == ENOSYS) {
-+			printf("userfaultfd syscall not available in this kernel\n");
-+			exit(KSFT_SKIP);
-+		}
-+		err("userfaultfd syscall failed with errno: %d\n", errno);
-+	}
- 	uffd_flags = fcntl(uffd, F_GETFD, NULL);
- 
- 	uffdio_api.api = UFFD_API;
-@@ -720,6 +727,9 @@ static void *uffd_poll_thread(void *arg)
+@@ -821,6 +823,9 @@ static void *uffd_poll_thread(void *arg)
  	pollfd[1].fd = pipefd[cpu*2];
  	pollfd[1].events = POLLIN;
  
@@ -83,7 +67,7 @@ index 3fc1d2ee29485..e7a79f120cbde 100644
  	for (;;) {
  		ret = poll(pollfd, 2, -1);
  		if (ret <= 0) {
-@@ -766,15 +776,28 @@ static void *uffd_poll_thread(void *arg)
+@@ -868,15 +873,27 @@ static void *uffd_poll_thread(void *arg)
  
  pthread_mutex_t uffd_read_mutex = PTHREAD_MUTEX_INITIALIZER;
  
@@ -100,13 +84,13 @@ index 3fc1d2ee29485..e7a79f120cbde 100644
  	struct uffd_msg msg;
 +	jmp_buf env;
 +	int setjmp_ret;
-+
+ 
+-	pthread_mutex_unlock(&uffd_read_mutex);
+-	/* from here cancellation is ok */
 +	pthread_setspecific(long_jmp_key, &env);
  
- 	pthread_mutex_unlock(&uffd_read_mutex);
--	/* from here cancellation is ok */
- 
 -	for (;;) {
++	pthread_mutex_unlock(&uffd_read_mutex);
 +	// One first return setjmp return 0. On second (fake) return from
 +	// longjmp() it returns the provided value, which will be 1 in our case.
 +	setjmp_ret = setjmp(env);
@@ -114,7 +98,7 @@ index 3fc1d2ee29485..e7a79f120cbde 100644
  		if (uffd_read_msg(uffd, &msg))
  			continue;
  		uffd_handle_page_fault(&msg, stats);
-@@ -872,7 +895,7 @@ static int stress(struct uffd_stats *uffd_stats)
+@@ -974,7 +991,7 @@ static int stress(struct uffd_stats *uffd_stats)
  					 (void *)&uffd_stats[cpu]))
  				return 1;
  		} else {
@@ -123,7 +107,7 @@ index 3fc1d2ee29485..e7a79f120cbde 100644
  				return 1;
  			if (pthread_join(uffd_threads[cpu], NULL))
  				return 1;
-@@ -1112,6 +1135,10 @@ static int userfaultfd_events_test(void)
+@@ -1208,6 +1225,10 @@ static int userfaultfd_events_test(void)
  	char c;
  	struct uffd_stats stats = { 0 };
  
@@ -134,7 +118,7 @@ index 3fc1d2ee29485..e7a79f120cbde 100644
  	printf("testing events (fork, remap, remove): ");
  	fflush(stdout);
  
-@@ -1135,6 +1162,11 @@ static int userfaultfd_events_test(void)
+@@ -1231,6 +1252,11 @@ static int userfaultfd_events_test(void)
  	if (pthread_create(&uffd_mon, &attr, uffd_poll_thread, &stats))
  		err("uffd_poll_thread create");
  
@@ -146,7 +130,7 @@ index 3fc1d2ee29485..e7a79f120cbde 100644
  	pid = fork();
  	if (pid < 0)
  		err("fork");
-@@ -1165,6 +1197,10 @@ static int userfaultfd_sig_test(void)
+@@ -1261,6 +1287,10 @@ static int userfaultfd_sig_test(void)
  	char c;
  	struct uffd_stats stats = { 0 };
  
@@ -157,7 +141,7 @@ index 3fc1d2ee29485..e7a79f120cbde 100644
  	printf("testing signal delivery: ");
  	fflush(stdout);
  
-@@ -1192,6 +1228,11 @@ static int userfaultfd_sig_test(void)
+@@ -1288,6 +1318,11 @@ static int userfaultfd_sig_test(void)
  	if (pthread_create(&uffd_mon, &attr, uffd_poll_thread, &stats))
  		err("uffd_poll_thread create");
  
@@ -169,19 +153,19 @@ index 3fc1d2ee29485..e7a79f120cbde 100644
  	pid = fork();
  	if (pid < 0)
  		err("fork");
-@@ -1421,6 +1462,7 @@ static int userfaultfd_stress(void)
- 	char *tmp_area;
+@@ -1540,6 +1575,7 @@ static int userfaultfd_stress(void)
+ 	void *area;
  	unsigned long nr;
  	struct uffdio_register uffdio_register;
 +	struct sigaction act;
  	struct uffd_stats uffd_stats[nr_cpus];
  
  	uffd_test_ctx_init(0);
-@@ -1435,6 +1477,17 @@ static int userfaultfd_stress(void)
+@@ -1554,6 +1590,17 @@ static int userfaultfd_stress(void)
  	pthread_attr_init(&attr);
  	pthread_attr_setstacksize(&attr, 16*1024*1024);
  
-+	// For handling thread termination of read thread in the absense of
++	// For handling thread termination of read thread in the absence of
 +	// pthread_cancel().
 +	pthread_key_create(&long_jmp_key, NULL);
 +	memset(&act, 0, sizeof(act));
@@ -195,7 +179,7 @@ index 3fc1d2ee29485..e7a79f120cbde 100644
  	while (bounces--) {
  		printf("bounces: %d, mode:", bounces);
  		if (bounces & BOUNCE_RANDOM)
-@@ -1555,6 +1608,8 @@ static int userfaultfd_stress(void)
+@@ -1670,6 +1717,8 @@ static int userfaultfd_stress(void)
  		userfaultfd_pagemap_test(page_size * 512);
  	}
  
@@ -204,29 +188,6 @@ index 3fc1d2ee29485..e7a79f120cbde 100644
  	return userfaultfd_zeropage_test() || userfaultfd_sig_test()
  		|| userfaultfd_events_test() || userfaultfd_minor_test();
  }
-@@ -1649,6 +1704,9 @@ static void sigalrm(int sig)
- 
- int main(int argc, char **argv)
- {
-+	char randstate[64];
-+	unsigned int seed;
-+
- 	if (argc < 4)
- 		usage();
- 
-@@ -1692,6 +1750,12 @@ int main(int argc, char **argv)
- 			      nr_pages * page_size * 2))
- 			err("fallocate");
- 	}
-+
-+	seed = (unsigned int) time(NULL);
-+	bzero(&randstate, sizeof(randstate));
-+	if (!initstate(seed, randstate, sizeof(randstate)))
-+		fprintf(stderr, "srandom_r error\n"), exit(1);
-+
- 	printf("nr_pages: %lu, nr_pages_per_cpu: %lu\n",
- 	       nr_pages, nr_pages_per_cpu);
- 	return userfaultfd_stress();
 -- 
-2.36.0.550.gb090851708-goog
+2.42.0.609.gbb76f46606-goog
 

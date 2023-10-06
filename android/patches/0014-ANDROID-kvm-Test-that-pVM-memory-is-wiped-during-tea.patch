@@ -1,7 +1,7 @@
-From bd511623ee96ec115f2887334e36e80f0624564a Mon Sep 17 00:00:00 2001
+From 1c3b492b2863b4833ec3f9a4df5a827e69c64af8 Mon Sep 17 00:00:00 2001
 From: Quentin Perret <qperret@google.com>
 Date: Thu, 17 Feb 2022 19:34:27 +0000
-Subject: [PATCH 17/24] ANDROID: kvm: Test that pVM memory is wiped during
+Subject: [PATCH 14/20] ANDROID: kvm: Test that pVM memory is wiped during
  teardown
 
 In protected KVM mode, we expect the hypervisor to protect guest secrets
@@ -24,7 +24,7 @@ Signed-off-by: Quentin Perret <qperret@google.com>
 
 diff --git a/tools/testing/selftests/kvm/aarch64/pvm_wipe_mem.c b/tools/testing/selftests/kvm/aarch64/pvm_wipe_mem.c
 new file mode 100644
-index 0000000000000..4af8ca3c4bad2
+index 000000000000..4af8ca3c4bad
 --- /dev/null
 +++ b/tools/testing/selftests/kvm/aarch64/pvm_wipe_mem.c
 @@ -0,0 +1,174 @@
@@ -203,5 +203,5 @@ index 0000000000000..4af8ca3c4bad2
 +	ksft_exit_pass();
 +}
 -- 
-2.36.0.550.gb090851708-goog
+2.42.0.609.gbb76f46606-goog
 

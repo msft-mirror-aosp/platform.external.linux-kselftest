@@ -1,7 +1,7 @@
-From f1c857243ce8f64e1e1d1c088e269fa294d34802 Mon Sep 17 00:00:00 2001
+From 356a6df12a0de67bdafb598dc998b3663f85cd8f Mon Sep 17 00:00:00 2001
 From: Steve Muckle <smuckle@google.com>
 Date: Tue, 31 Oct 2017 13:50:22 -0700
-Subject: [PATCH 11/24] kselftest: vDSO: fix build issues
+Subject: [PATCH 10/20] vDSO/parse_vdso: fix build issues
 
 Fix a couple build issues in vdso_test.
 
@@ -12,7 +12,7 @@ Signed-off-by: Steve Muckle <smuckle@google.com>
  1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/tools/testing/selftests/vDSO/parse_vdso.c b/tools/testing/selftests/vDSO/parse_vdso.c
-index 413f75620a35b..945d4e63296af 100644
+index 413f75620a35..945d4e63296a 100644
 --- a/tools/testing/selftests/vDSO/parse_vdso.c
 +++ b/tools/testing/selftests/vDSO/parse_vdso.c
 @@ -56,13 +56,16 @@ static struct vdso_info
@@ -35,5 +35,5 @@ index 413f75620a35b..945d4e63296af 100644
  		h &= ~g;
  	}
 -- 
-2.36.0.550.gb090851708-goog
+2.42.0.609.gbb76f46606-goog
 

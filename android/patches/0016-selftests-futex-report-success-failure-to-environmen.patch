@@ -1,44 +1,45 @@
-From 85c96201ca9d2e40ad8d714f07b0245bcee5ab21 Mon Sep 17 00:00:00 2001
+From 9b608d07ba3729bc7913619c1c0c2de70ec56cb5 Mon Sep 17 00:00:00 2001
 From: Steve Muckle <smuckle@google.com>
 Date: Tue, 7 Nov 2017 16:01:53 -0800
-Subject: [PATCH 13/24] selftests/futex: report success/failure to environment
+Subject: [PATCH 16/20] selftests/futex: report success/failure to environment
 
 Report whether or not any tests failed to the caller of the run.sh
 script.
 
+Skip tests when required syscall is not present.
+
 (cherry picked from commit 5c9ad29f58246b95fd5f1940e6b03ac485cc5168)
 Bug: 31590178
+Bug: 189333904
 Test: run vts-kernel -m VtsKernelLinuxKselftestStaging
 Signed-off-by: Steve Muckle <smuckle@google.com>
+Signed-off-by: Edward Liaw <edliaw@google.com>
 ---
- .../testing/selftests/futex/functional/run.sh | 69 +++++++++++--------
- 1 file changed, 40 insertions(+), 29 deletions(-)
+ .../testing/selftests/futex/functional/run.sh | 70 +++++++++++--------
+ 1 file changed, 41 insertions(+), 29 deletions(-)
 
 diff --git a/tools/testing/selftests/futex/functional/run.sh b/tools/testing/selftests/futex/functional/run.sh
-index 5ccd599da6c30..6eb4a8dd86757 100755
+index 5ccd599da6c3..942dab5b5879 100755
 --- a/tools/testing/selftests/futex/functional/run.sh
 +++ b/tools/testing/selftests/futex/functional/run.sh
-@@ -18,6 +18,14 @@
+@@ -18,6 +18,16 @@
  #
  ###############################################################################
  
 +run_test()
 +{
-+	$@
-+	if [ $? -ne 0 ]; then
-+		rc=1
-+	fi
++    $@
++    ret=$?
++    if [ $ret -ne 0 ] && [ $ret -ne 4 ]; then  # KSFT_SKIP=4
++        echo "Failed with $ret"
++        rc=1
++    fi
 +}
 +
  # Test for a color capable console
  if [ -z "$USE_COLOR" ]; then
      tput setf 7 || tput setaf 7
-@@ -30,55 +38,58 @@ if [ "$USE_COLOR" -eq 1 ]; then
-     COLOR="-c"
- fi
- 
-+rc=0
- 
+@@ -34,51 +44,53 @@ fi
  echo
  # requeue pi testing
  # without timeouts
@@ -122,5 +123,5 @@ index 5ccd599da6c30..6eb4a8dd86757 100755
 +
 +exit $rc
 -- 
-2.36.0.550.gb090851708-goog
+2.42.0.609.gbb76f46606-goog
 

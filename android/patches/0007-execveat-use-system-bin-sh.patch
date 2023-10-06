@@ -1,7 +1,7 @@
-From adbb83f8dfd4dff638a57ca220634f9dfd1f565b Mon Sep 17 00:00:00 2001
+From c64fa51fbdabea40dedfbd3a86aee5a2e7ba460c Mon Sep 17 00:00:00 2001
 From: Steve Muckle <smuckle@google.com>
 Date: Mon, 9 Oct 2017 15:06:34 -0700
-Subject: [PATCH 07/24] selftests/exec: use /system/bin/sh
+Subject: [PATCH 07/20] execveat: use /system/bin/sh
 
 The Android shell is located at /system/bin/sh.
 
@@ -14,7 +14,7 @@ Signed-off-by: Steve Muckle <smuckle@google.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tools/testing/selftests/exec/execveat.c b/tools/testing/selftests/exec/execveat.c
-index 67bf7254a48f0..ecc974e75a9ba 100644
+index 67bf7254a48f..ecc974e75a9b 100644
 --- a/tools/testing/selftests/exec/execveat.c
 +++ b/tools/testing/selftests/exec/execveat.c
 @@ -379,7 +379,7 @@ static int run_tests(void)
@@ -27,5 +27,5 @@ index 67bf7254a48f0..ecc974e75a9ba 100644
  	/* Create ephemeral copies of files */
  	exe_cp("execveat", "execveat.ephemeral");
 -- 
-2.36.0.550.gb090851708-goog
+2.42.0.609.gbb76f46606-goog
 
