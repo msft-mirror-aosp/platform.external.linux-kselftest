@@ -13,13 +13,11 @@
  * we need to use the kernel's siginfo.h file and trick glibc
  * into accepting it.
  */
-#if defined(__GLIBC_PREREQ)
 #if !__GLIBC_PREREQ(2, 26)
 # include <asm/siginfo.h>
 # define __have_siginfo_t 1
 # define __have_sigval_t 1
 # define __have_sigevent_t 1
-#endif
 #endif
 
 #include <errno.h>
@@ -48,6 +46,7 @@
 #include <sys/ioctl.h>
 #include <linux/kcmp.h>
 #include <sys/resource.h>
+#include <sys/capability.h>
 
 #include <unistd.h>
 #include <sys/syscall.h>
@@ -60,6 +59,8 @@
 #ifndef SKIP
 #define SKIP(s, ...)	XFAIL(s, ##__VA_ARGS__)
 #endif
+
+#define MIN(X, Y) ((X) < (Y) ? (X) : (Y))
 
 #ifndef PR_SET_PTRACER
 # define PR_SET_PTRACER 0x59616d61
@@ -268,6 +269,10 @@ struct seccomp_notif_addfd_big {
 
 #ifndef SECCOMP_FILTER_FLAG_TSYNC_ESRCH
 #define SECCOMP_FILTER_FLAG_TSYNC_ESRCH (1UL << 4)
+#endif
+
+#ifndef SECCOMP_FILTER_FLAG_WAIT_KILLABLE_RECV
+#define SECCOMP_FILTER_FLAG_WAIT_KILLABLE_RECV (1UL << 5)
 #endif
 
 #ifndef seccomp
@@ -850,8 +855,6 @@ void kill_thread_or_group(struct __test_metadata *_metadata,
 	exit(42);
 }
 
-/* b/147676645 */
-#ifndef __ANDROID__
 TEST(KILL_thread)
 {
 	int status;
@@ -870,7 +873,6 @@ TEST(KILL_thread)
 	ASSERT_TRUE(WIFEXITED(status));
 	ASSERT_EQ(42, WEXITSTATUS(status));
 }
-#endif
 
 TEST(KILL_process)
 {
@@ -960,7 +962,7 @@ TEST(ERRNO_valid)
 	ASSERT_EQ(0, ret);
 
 	EXPECT_EQ(parent, syscall(__NR_getppid));
-	EXPECT_EQ(-1, read(0, NULL, 0));
+	EXPECT_EQ(-1, read(-1, NULL, 0));
 	EXPECT_EQ(E2BIG, errno);
 }
 
@@ -979,7 +981,7 @@ TEST(ERRNO_zero)
 
 	EXPECT_EQ(parent, syscall(__NR_getppid));
 	/* "errno" of 0 is ok. */
-	EXPECT_EQ(0, read(0, NULL, 0));
+	EXPECT_EQ(0, read(-1, NULL, 0));
 }
 
 /*
@@ -1000,7 +1002,7 @@ TEST(ERRNO_capped)
 	ASSERT_EQ(0, ret);
 
 	EXPECT_EQ(parent, syscall(__NR_getppid));
-	EXPECT_EQ(-1, read(0, NULL, 0));
+	EXPECT_EQ(-1, read(-1, NULL, 0));
 	EXPECT_EQ(4095, errno);
 }
 
@@ -1031,7 +1033,7 @@ TEST(ERRNO_order)
 	ASSERT_EQ(0, ret);
 
 	EXPECT_EQ(parent, syscall(__NR_getppid));
-	EXPECT_EQ(-1, read(0, NULL, 0));
+	EXPECT_EQ(-1, read(-1, NULL, 0));
 	EXPECT_EQ(12, errno);
 }
 
@@ -2045,15 +2047,8 @@ void tracer_ptrace(struct __test_metadata *_metadata, pid_t tracee,
 	/* Make sure we got an appropriate message. */
 	ret = ptrace(PTRACE_GETEVENTMSG, tracee, NULL, &msg);
 	EXPECT_EQ(0, ret);
-
-	/*
-	 * TODO: b/33027081
-	 * PTRACE_EVENTMSG_SYSCALL_ENTRY and PTRACE_EVENTMSG_SYSCALL_EXIT not
-	 * compatible < 5.3 (see 201766a)
-	 *
-	 * EXPECT_EQ(entry ? PTRACE_EVENTMSG_SYSCALL_ENTRY
-	 * 		: PTRACE_EVENTMSG_SYSCALL_EXIT, msg);
-	 */
+	EXPECT_EQ(entry ? PTRACE_EVENTMSG_SYSCALL_ENTRY
+			: PTRACE_EVENTMSG_SYSCALL_EXIT, msg);
 
 	/*
 	 * Some architectures only support setting return values during
@@ -2175,9 +2170,6 @@ FIXTURE_TEARDOWN(TRACE_syscall)
 
 TEST(negative_ENOSYS)
 {
-#if defined(__arm__)
-	SKIP(return, "arm32 does not support calling syscall -1");
-#endif
 	/*
 	 * There should be no difference between an "internal" skip
 	 * and userspace asking for syscall "-1".
@@ -2382,14 +2374,6 @@ TEST(seccomp_syscall_mode_lock)
 }
 
 /*
- * b/147676645
- * SECCOMP_FILTER_FLAG_TSYNC_ESRCH not compatible < 5.7
- * SECCOMP_FILTER_FLAG_NEW_LISTENER not compatible < 5.0
- * SECCOMP_FILTER_FLAG_SPEC_ALLOW not compatible < 4.17
- * SECCOMP_FILTER_FLAG_LOG not compatible < 4.14
- */
-#ifndef __ANDROID__
-/*
  * Test detection of known and unknown filter flags. Userspace needs to be able
  * to check if a filter flag is supported by the current kernel and a good way
  * of doing that is by attempting to enter filter mode, with the flag bit in
@@ -2479,7 +2463,6 @@ TEST(detect_seccomp_filter_flags)
 		       flag);
 	}
 }
-#endif
 
 TEST(TSYNC_first)
 {
@@ -2647,7 +2630,7 @@ void *tsync_sibling(void *data)
 	ret = prctl(PR_GET_NO_NEW_PRIVS, 0, 0, 0, 0);
 	if (!ret)
 		return (void *)SIBLING_EXIT_NEWPRIVS;
-	read(0, NULL, 0);
+	read(-1, NULL, 0);
 	return (void *)SIBLING_EXIT_UNKILLED;
 }
 
@@ -2861,11 +2844,6 @@ TEST_F(TSYNC, two_siblings_with_one_divergence)
 	EXPECT_EQ(SIBLING_EXIT_UNKILLED, (long)status);
 }
 
-/*
- * b/147676645
- * SECCOMP_FILTER_FLAG_TSYNC_ESRCH not compatible < 5.7
- */
-#ifndef __ANDROID__
 TEST_F(TSYNC, two_siblings_with_one_divergence_no_tid_in_err)
 {
 	long ret, flags;
@@ -2914,7 +2892,6 @@ TEST_F(TSYNC, two_siblings_with_one_divergence_no_tid_in_err)
 	PTHREAD_JOIN(self->sibling[1].tid, &status);
 	EXPECT_EQ(SIBLING_EXIT_UNKILLED, (long)status);
 }
-#endif
 
 TEST_F(TSYNC, two_siblings_not_under_filter)
 {
@@ -3044,7 +3021,6 @@ TEST(syscall_restart)
 	};
 #if defined(__arm__)
 	struct utsname utsbuf;
-	int arm_version;
 #endif
 
 	ASSERT_EQ(0, pipe(pipefd));
@@ -3082,8 +3058,7 @@ TEST(syscall_restart)
 		timeout.tv_sec = 1;
 		errno = 0;
 		EXPECT_EQ(0, nanosleep(&timeout, NULL)) {
-			TH_LOG("Call to nanosleep() failed (errno %d: %s)",
-				errno, strerror(errno));
+			TH_LOG("Call to nanosleep() failed (errno %d)", errno);
 		}
 
 		/* Read final sync from parent. */
@@ -3161,12 +3136,12 @@ TEST(syscall_restart)
 	ret = get_syscall(_metadata, child_pid);
 #if defined(__arm__)
 	/*
+	 * FIXME:
 	 * - native ARM registers do NOT expose true syscall.
 	 * - compat ARM registers on ARM64 DO expose true syscall.
 	 */
 	ASSERT_EQ(0, uname(&utsbuf));
-	if (sscanf(utsbuf.machine, "armv%d", &arm_version) == 1 &&
-	    arm_version < 8) {
+	if (strncmp(utsbuf.machine, "arm", 3) == 0) {
 		EXPECT_EQ(__NR_nanosleep, ret);
 	} else
 #endif
@@ -3277,11 +3252,6 @@ TEST(get_action_avail)
 	EXPECT_EQ(errno, EOPNOTSUPP);
 }
 
-/*
- * b/147676645
- * PTRACE_SECCOMP_GET_METADATA not compatible < 4.16
- */
-#ifndef __ANDROID__
 TEST(get_metadata)
 {
 	pid_t pid;
@@ -3350,13 +3320,7 @@ TEST(get_metadata)
 skip:
 	ASSERT_EQ(0, kill(pid, SIGKILL));
 }
-#endif
 
-/*
- * b/147676645
- * SECCOMP_FILTER_FLAG_NEW_LISTENER not compatible < 5.0
- */
-#ifndef __ANDROID__
 static int user_notif_syscall(int nr, unsigned int flags)
 {
 	struct sock_filter filter[] = {
@@ -3481,13 +3445,7 @@ TEST(user_notification_basic)
 	EXPECT_EQ(true, WIFEXITED(status));
 	EXPECT_EQ(0, WEXITSTATUS(status));
 }
-#endif
 
-/*
- * b/147676645
- * SECCOMP_FILTER_FLAG_NEW_LISTENER not compatible < 5.0
- */
-#ifndef __ANDROID__
 TEST(user_notification_with_tsync)
 {
 	int ret;
@@ -3510,13 +3468,7 @@ TEST(user_notification_with_tsync)
 	close(ret);
 	ASSERT_LE(0, ret);
 }
-#endif
 
-/*
- * b/147676645
- * SECCOMP_FILTER_FLAG_NEW_LISTENER not compatible < 5.0
- */
-#ifndef __ANDROID__
 TEST(user_notification_kill_in_middle)
 {
 	pid_t pid;
@@ -3567,13 +3519,7 @@ static void signal_handler(int signal)
 	if (write(handled, "c", 1) != 1)
 		perror("write from signal");
 }
-#endif
 
-/*
- * b/147676645
- * SECCOMP_FILTER_FLAG_NEW_LISTENER not compatible < 5.0
- */
-#ifndef __ANDROID__
 TEST(user_notification_signal)
 {
 	pid_t pid;
@@ -3648,13 +3594,7 @@ TEST(user_notification_signal)
 	EXPECT_EQ(true, WIFEXITED(status));
 	EXPECT_EQ(0, WEXITSTATUS(status));
 }
-#endif
 
-/*
- * b/147676645
- * SECCOMP_FILTER_FLAG_NEW_LISTENER not compatible < 5.0
- */
-#ifndef __ANDROID__
 TEST(user_notification_closed_listener)
 {
 	pid_t pid;
@@ -3687,15 +3627,7 @@ TEST(user_notification_closed_listener)
 	EXPECT_EQ(true, WIFEXITED(status));
 	EXPECT_EQ(0, WEXITSTATUS(status));
 }
-#endif
 
-/*
- * b/147676645
- * SECCOMP_FILTER_FLAG_NEW_LISTENER not compatible < 5.0
- * unshare(CLONE_NEWUSER) returns EINVAL with Android
- * unshare(CLONE_NEWPID) returns EINVAL with Android
- */
-#ifndef __ANDROID__
 /*
  * Check that a pid in a child namespace still shows up as valid in ours.
  */
@@ -3735,14 +3667,7 @@ TEST(user_notification_child_pid_ns)
 	EXPECT_EQ(0, WEXITSTATUS(status));
 	close(listener);
 }
-#endif
 
-/*
- * b/147676645
- * SECCOMP_FILTER_FLAG_NEW_LISTENER not compatible < 5.0
- * unshare(CLONE_NEWPID) returns EINVAL with Android
- */
-#ifndef __ANDROID__
 /*
  * Check that a pid in a sibling (i.e. unrelated) namespace shows up as 0, i.e.
  * invalid.
@@ -3816,14 +3741,7 @@ TEST(user_notification_sibling_pid_ns)
 	EXPECT_EQ(true, WIFEXITED(status));
 	EXPECT_EQ(0, WEXITSTATUS(status));
 }
-#endif
 
-/*
- * b/147676645
- * SECCOMP_FILTER_FLAG_NEW_LISTENER not compatible < 5.0
- * unshare(CLONE_NEWUSER) returns EINVAL with Android
- */
-#ifndef __ANDROID__
 TEST(user_notification_fault_recv)
 {
 	pid_t pid;
@@ -3831,7 +3749,10 @@ TEST(user_notification_fault_recv)
 	struct seccomp_notif req = {};
 	struct seccomp_notif_resp resp = {};
 
-	ASSERT_EQ(unshare(CLONE_NEWUSER), 0);
+	ASSERT_EQ(unshare(CLONE_NEWUSER), 0) {
+		if (errno == EINVAL)
+			SKIP(return, "kernel missing CLONE_NEWUSER support");
+	}
 
 	listener = user_notif_syscall(__NR_getppid,
 				      SECCOMP_FILTER_FLAG_NEW_LISTENER);
@@ -3861,13 +3782,7 @@ TEST(user_notification_fault_recv)
 	EXPECT_EQ(true, WIFEXITED(status));
 	EXPECT_EQ(0, WEXITSTATUS(status));
 }
-#endif
 
-/*
- * b/147676645
- * SECCOMP_GET_NOTIF_SIZES not compatible < 5.0
- */
-#ifndef __ANDROID__
 TEST(seccomp_get_notif_sizes)
 {
 	struct seccomp_notif_sizes sizes;
@@ -3876,13 +3791,7 @@ TEST(seccomp_get_notif_sizes)
 	EXPECT_EQ(sizes.seccomp_notif, sizeof(struct seccomp_notif));
 	EXPECT_EQ(sizes.seccomp_notif_resp, sizeof(struct seccomp_notif_resp));
 }
-#endif
 
-/*
- * b/147676645
- * SECCOMP_FILTER_FLAG_NEW_LISTENER not compatible < 5.0
- */
-#ifndef __ANDROID__
 TEST(user_notification_continue)
 {
 	pid_t pid;
@@ -3968,13 +3877,7 @@ skip:
 		}
 	}
 }
-#endif
 
-/*
- * b/147676645
- * SECCOMP_FILTER_FLAG_NEW_LISTENER not compatible < 5.0
- */
-#ifndef __ANDROID__
 TEST(user_notification_filter_empty)
 {
 	pid_t pid;
@@ -3990,9 +3893,6 @@ TEST(user_notification_filter_empty)
 	ASSERT_EQ(0, ret) {
 		TH_LOG("Kernel does not support PR_SET_NO_NEW_PRIVS!");
 	}
-
-	if (__NR_clone3 < 0)
-		SKIP(return, "Test not built with clone3 support");
 
 	pid = sys_clone3(&args, sizeof(args));
 	ASSERT_GE(pid, 0);
@@ -4026,13 +3926,7 @@ TEST(user_notification_filter_empty)
 	EXPECT_GT(poll(&pollfd, 1, 2000), 0);
 	EXPECT_GT((pollfd.revents & POLLHUP) ?: 0, 0);
 }
-#endif
 
-/*
- * b/147676645
- * SECCOMP_FILTER_FLAG_NEW_LISTENER not compatible < 5.0
- */
-#ifndef __ANDROID__
 static void *do_thread(void *data)
 {
 	return NULL;
@@ -4053,9 +3947,6 @@ TEST(user_notification_filter_empty_threaded)
 	ASSERT_EQ(0, ret) {
 		TH_LOG("Kernel does not support PR_SET_NO_NEW_PRIVS!");
 	}
-
-	if (__NR_clone3 < 0)
-		SKIP(return, "Test not built with clone3 support");
 
 	pid = sys_clone3(&args, sizeof(args));
 	ASSERT_GE(pid, 0);
@@ -4121,15 +4012,7 @@ TEST(user_notification_filter_empty_threaded)
 	EXPECT_GT(poll(&pollfd, 1, 2000), 0);
 	EXPECT_GT((pollfd.revents & POLLHUP) ?: 0, 0);
 }
-#endif
 
-/*
- * b/147676645
- * SECCOMP_ADDED_FLAG_SEND not compatible < 5.14
- * SECCOMP_IOCTL_NOTIF_ADDFD not comptible < 5.9
- * SECCOMP_FILTER_FLAG_NEW_LISTENER not compatible < 5.0
- */
-#ifndef __ANDROID__
 TEST(user_notification_addfd)
 {
 	pid_t pid;
@@ -4287,15 +4170,7 @@ TEST(user_notification_addfd)
 
 	close(memfd);
 }
-#endif
 
-/*
- * b/147676645
- * SECCOMP_ADDED_FLAG_SEND not compatible < 5.14
- * SECCOMP_IOCTL_NOTIF_ADDFD not comptible < 5.9
- * SECCOMP_FILTER_FLAG_NEW_LISTENER not compatible < 5.0
- */
-#ifndef __ANDROID__
 TEST(user_notification_addfd_rlimit)
 {
 	pid_t pid;
@@ -4365,7 +4240,421 @@ TEST(user_notification_addfd_rlimit)
 
 	close(memfd);
 }
-#endif
+
+/* Make sure PTRACE_O_SUSPEND_SECCOMP requires CAP_SYS_ADMIN. */
+FIXTURE(O_SUSPEND_SECCOMP) {
+	pid_t pid;
+};
+
+FIXTURE_SETUP(O_SUSPEND_SECCOMP)
+{
+	ERRNO_FILTER(block_read, E2BIG);
+	cap_value_t cap_list[] = { CAP_SYS_ADMIN };
+	cap_t caps;
+
+	self->pid = 0;
+
+	/* make sure we don't have CAP_SYS_ADMIN */
+	caps = cap_get_proc();
+	ASSERT_NE(NULL, caps);
+	ASSERT_EQ(0, cap_set_flag(caps, CAP_EFFECTIVE, 1, cap_list, CAP_CLEAR));
+	ASSERT_EQ(0, cap_set_proc(caps));
+	cap_free(caps);
+
+	ASSERT_EQ(0, prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0));
+	ASSERT_EQ(0, prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &prog_block_read));
+
+	self->pid = fork();
+	ASSERT_GE(self->pid, 0);
+
+	if (self->pid == 0) {
+		while (1)
+			pause();
+		_exit(127);
+	}
+}
+
+FIXTURE_TEARDOWN(O_SUSPEND_SECCOMP)
+{
+	if (self->pid)
+		kill(self->pid, SIGKILL);
+}
+
+TEST_F(O_SUSPEND_SECCOMP, setoptions)
+{
+	int wstatus;
+
+	ASSERT_EQ(0, ptrace(PTRACE_ATTACH, self->pid, NULL, 0));
+	ASSERT_EQ(self->pid, wait(&wstatus));
+	ASSERT_EQ(-1, ptrace(PTRACE_SETOPTIONS, self->pid, NULL, PTRACE_O_SUSPEND_SECCOMP));
+	if (errno == EINVAL)
+		SKIP(return, "Kernel does not support PTRACE_O_SUSPEND_SECCOMP (missing CONFIG_CHECKPOINT_RESTORE?)");
+	ASSERT_EQ(EPERM, errno);
+}
+
+TEST_F(O_SUSPEND_SECCOMP, seize)
+{
+	int ret;
+
+	ret = ptrace(PTRACE_SEIZE, self->pid, NULL, PTRACE_O_SUSPEND_SECCOMP);
+	ASSERT_EQ(-1, ret);
+	if (errno == EINVAL)
+		SKIP(return, "Kernel does not support PTRACE_O_SUSPEND_SECCOMP (missing CONFIG_CHECKPOINT_RESTORE?)");
+	ASSERT_EQ(EPERM, errno);
+}
+
+/*
+ * get_nth - Get the nth, space separated entry in a file.
+ *
+ * Returns the length of the read field.
+ * Throws error if field is zero-lengthed.
+ */
+static ssize_t get_nth(struct __test_metadata *_metadata, const char *path,
+		     const unsigned int position, char **entry)
+{
+	char *line = NULL;
+	unsigned int i;
+	ssize_t nread;
+	size_t len = 0;
+	FILE *f;
+
+	f = fopen(path, "r");
+	ASSERT_NE(f, NULL) {
+		TH_LOG("Could not open %s: %s", path, strerror(errno));
+	}
+
+	for (i = 0; i < position; i++) {
+		nread = getdelim(&line, &len, ' ', f);
+		ASSERT_GE(nread, 0) {
+			TH_LOG("Failed to read %d entry in file %s", i, path);
+		}
+	}
+	fclose(f);
+
+	ASSERT_GT(nread, 0) {
+		TH_LOG("Entry in file %s had zero length", path);
+	}
+
+	*entry = line;
+	return nread - 1;
+}
+
+/* For a given PID, get the task state (D, R, etc...) */
+static char get_proc_stat(struct __test_metadata *_metadata, pid_t pid)
+{
+	char proc_path[100] = {0};
+	char status;
+	char *line;
+
+	snprintf(proc_path, sizeof(proc_path), "/proc/%d/stat", pid);
+	ASSERT_EQ(get_nth(_metadata, proc_path, 3, &line), 1);
+
+	status = *line;
+	free(line);
+
+	return status;
+}
+
+TEST(user_notification_fifo)
+{
+	struct seccomp_notif_resp resp = {};
+	struct seccomp_notif req = {};
+	int i, status, listener;
+	pid_t pid, pids[3];
+	__u64 baseid;
+	long ret;
+	/* 100 ms */
+	struct timespec delay = { .tv_nsec = 100000000 };
+
+	ret = prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0);
+	ASSERT_EQ(0, ret) {
+		TH_LOG("Kernel does not support PR_SET_NO_NEW_PRIVS!");
+	}
+
+	/* Setup a listener */
+	listener = user_notif_syscall(__NR_getppid,
+				      SECCOMP_FILTER_FLAG_NEW_LISTENER);
+	ASSERT_GE(listener, 0);
+
+	pid = fork();
+	ASSERT_GE(pid, 0);
+
+	if (pid == 0) {
+		ret = syscall(__NR_getppid);
+		exit(ret != USER_NOTIF_MAGIC);
+	}
+
+	EXPECT_EQ(ioctl(listener, SECCOMP_IOCTL_NOTIF_RECV, &req), 0);
+	baseid = req.id + 1;
+
+	resp.id = req.id;
+	resp.error = 0;
+	resp.val = USER_NOTIF_MAGIC;
+
+	/* check that we make sure flags == 0 */
+	EXPECT_EQ(ioctl(listener, SECCOMP_IOCTL_NOTIF_SEND, &resp), 0);
+
+	EXPECT_EQ(waitpid(pid, &status, 0), pid);
+	EXPECT_EQ(true, WIFEXITED(status));
+	EXPECT_EQ(0, WEXITSTATUS(status));
+
+	/* Start children, and generate notifications */
+	for (i = 0; i < ARRAY_SIZE(pids); i++) {
+		pid = fork();
+		if (pid == 0) {
+			ret = syscall(__NR_getppid);
+			exit(ret != USER_NOTIF_MAGIC);
+		}
+		pids[i] = pid;
+	}
+
+	/* This spins until all of the children are sleeping */
+restart_wait:
+	for (i = 0; i < ARRAY_SIZE(pids); i++) {
+		if (get_proc_stat(_metadata, pids[i]) != 'S') {
+			nanosleep(&delay, NULL);
+			goto restart_wait;
+		}
+	}
+
+	/* Read the notifications in order (and respond) */
+	for (i = 0; i < ARRAY_SIZE(pids); i++) {
+		memset(&req, 0, sizeof(req));
+		EXPECT_EQ(ioctl(listener, SECCOMP_IOCTL_NOTIF_RECV, &req), 0);
+		EXPECT_EQ(req.id, baseid + i);
+		resp.id = req.id;
+		EXPECT_EQ(ioctl(listener, SECCOMP_IOCTL_NOTIF_SEND, &resp), 0);
+	}
+
+	/* Make sure notifications were received */
+	for (i = 0; i < ARRAY_SIZE(pids); i++) {
+		EXPECT_EQ(waitpid(pids[i], &status, 0), pids[i]);
+		EXPECT_EQ(true, WIFEXITED(status));
+		EXPECT_EQ(0, WEXITSTATUS(status));
+	}
+}
+
+/* get_proc_syscall - Get the syscall in progress for a given pid
+ *
+ * Returns the current syscall number for a given process
+ * Returns -1 if not in syscall (running or blocked)
+ */
+static long get_proc_syscall(struct __test_metadata *_metadata, int pid)
+{
+	char proc_path[100] = {0};
+	long ret = -1;
+	ssize_t nread;
+	char *line;
+
+	snprintf(proc_path, sizeof(proc_path), "/proc/%d/syscall", pid);
+	nread = get_nth(_metadata, proc_path, 1, &line);
+	ASSERT_GT(nread, 0);
+
+	if (!strncmp("running", line, MIN(7, nread)))
+		ret = strtol(line, NULL, 16);
+
+	free(line);
+	return ret;
+}
+
+/* Ensure non-fatal signals prior to receive are unmodified */
+TEST(user_notification_wait_killable_pre_notification)
+{
+	struct sigaction new_action = {
+		.sa_handler = signal_handler,
+	};
+	int listener, status, sk_pair[2];
+	pid_t pid;
+	long ret;
+	char c;
+	/* 100 ms */
+	struct timespec delay = { .tv_nsec = 100000000 };
+
+	ASSERT_EQ(sigemptyset(&new_action.sa_mask), 0);
+
+	ret = prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0);
+	ASSERT_EQ(0, ret)
+	{
+		TH_LOG("Kernel does not support PR_SET_NO_NEW_PRIVS!");
+	}
+
+	ASSERT_EQ(socketpair(PF_LOCAL, SOCK_SEQPACKET, 0, sk_pair), 0);
+
+	listener = user_notif_syscall(
+		__NR_getppid, SECCOMP_FILTER_FLAG_NEW_LISTENER |
+				      SECCOMP_FILTER_FLAG_WAIT_KILLABLE_RECV);
+	ASSERT_GE(listener, 0);
+
+	/*
+	 * Check that we can kill the process with SIGUSR1 prior to receiving
+	 * the notification. SIGUSR1 is wired up to a custom signal handler,
+	 * and make sure it gets called.
+	 */
+	pid = fork();
+	ASSERT_GE(pid, 0);
+
+	if (pid == 0) {
+		close(sk_pair[0]);
+		handled = sk_pair[1];
+
+		/* Setup the non-fatal sigaction without SA_RESTART */
+		if (sigaction(SIGUSR1, &new_action, NULL)) {
+			perror("sigaction");
+			exit(1);
+		}
+
+		ret = syscall(__NR_getppid);
+		/* Make sure we got a return from a signal interruption */
+		exit(ret != -1 || errno != EINTR);
+	}
+
+	/*
+	 * Make sure we've gotten to the seccomp user notification wait
+	 * from getppid prior to sending any signals
+	 */
+	while (get_proc_syscall(_metadata, pid) != __NR_getppid &&
+	       get_proc_stat(_metadata, pid) != 'S')
+		nanosleep(&delay, NULL);
+
+	/* Send non-fatal kill signal */
+	EXPECT_EQ(kill(pid, SIGUSR1), 0);
+
+	/* wait for process to exit (exit checks for EINTR) */
+	EXPECT_EQ(waitpid(pid, &status, 0), pid);
+	EXPECT_EQ(true, WIFEXITED(status));
+	EXPECT_EQ(0, WEXITSTATUS(status));
+
+	EXPECT_EQ(read(sk_pair[0], &c, 1), 1);
+}
+
+/* Ensure non-fatal signals after receive are blocked */
+TEST(user_notification_wait_killable)
+{
+	struct sigaction new_action = {
+		.sa_handler = signal_handler,
+	};
+	struct seccomp_notif_resp resp = {};
+	struct seccomp_notif req = {};
+	int listener, status, sk_pair[2];
+	pid_t pid;
+	long ret;
+	char c;
+	/* 100 ms */
+	struct timespec delay = { .tv_nsec = 100000000 };
+
+	ASSERT_EQ(sigemptyset(&new_action.sa_mask), 0);
+
+	ret = prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0);
+	ASSERT_EQ(0, ret)
+	{
+		TH_LOG("Kernel does not support PR_SET_NO_NEW_PRIVS!");
+	}
+
+	ASSERT_EQ(socketpair(PF_LOCAL, SOCK_SEQPACKET, 0, sk_pair), 0);
+
+	listener = user_notif_syscall(
+		__NR_getppid, SECCOMP_FILTER_FLAG_NEW_LISTENER |
+				      SECCOMP_FILTER_FLAG_WAIT_KILLABLE_RECV);
+	ASSERT_GE(listener, 0);
+
+	pid = fork();
+	ASSERT_GE(pid, 0);
+
+	if (pid == 0) {
+		close(sk_pair[0]);
+		handled = sk_pair[1];
+
+		/* Setup the sigaction without SA_RESTART */
+		if (sigaction(SIGUSR1, &new_action, NULL)) {
+			perror("sigaction");
+			exit(1);
+		}
+
+		/* Make sure that the syscall is completed (no EINTR) */
+		ret = syscall(__NR_getppid);
+		exit(ret != USER_NOTIF_MAGIC);
+	}
+
+	/*
+	 * Get the notification, to make move the notifying process into a
+	 * non-preemptible (TASK_KILLABLE) state.
+	 */
+	EXPECT_EQ(ioctl(listener, SECCOMP_IOCTL_NOTIF_RECV, &req), 0);
+	/* Send non-fatal kill signal */
+	EXPECT_EQ(kill(pid, SIGUSR1), 0);
+
+	/*
+	 * Make sure the task enters moves to TASK_KILLABLE by waiting for
+	 * D (Disk Sleep) state after receiving non-fatal signal.
+	 */
+	while (get_proc_stat(_metadata, pid) != 'D')
+		nanosleep(&delay, NULL);
+
+	resp.id = req.id;
+	resp.val = USER_NOTIF_MAGIC;
+	/* Make sure the notification is found and able to be replied to */
+	EXPECT_EQ(ioctl(listener, SECCOMP_IOCTL_NOTIF_SEND, &resp), 0);
+
+	/*
+	 * Make sure that the signal handler does get called once we're back in
+	 * userspace.
+	 */
+	EXPECT_EQ(read(sk_pair[0], &c, 1), 1);
+	/* wait for process to exit (exit checks for USER_NOTIF_MAGIC) */
+	EXPECT_EQ(waitpid(pid, &status, 0), pid);
+	EXPECT_EQ(true, WIFEXITED(status));
+	EXPECT_EQ(0, WEXITSTATUS(status));
+}
+
+/* Ensure fatal signals after receive are not blocked */
+TEST(user_notification_wait_killable_fatal)
+{
+	struct seccomp_notif req = {};
+	int listener, status;
+	pid_t pid;
+	long ret;
+	/* 100 ms */
+	struct timespec delay = { .tv_nsec = 100000000 };
+
+	ret = prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0);
+	ASSERT_EQ(0, ret)
+	{
+		TH_LOG("Kernel does not support PR_SET_NO_NEW_PRIVS!");
+	}
+
+	listener = user_notif_syscall(
+		__NR_getppid, SECCOMP_FILTER_FLAG_NEW_LISTENER |
+				      SECCOMP_FILTER_FLAG_WAIT_KILLABLE_RECV);
+	ASSERT_GE(listener, 0);
+
+	pid = fork();
+	ASSERT_GE(pid, 0);
+
+	if (pid == 0) {
+		/* This should never complete as it should get a SIGTERM */
+		syscall(__NR_getppid);
+		exit(1);
+	}
+
+	while (get_proc_stat(_metadata, pid) != 'S')
+		nanosleep(&delay, NULL);
+
+	/*
+	 * Get the notification, to make move the notifying process into a
+	 * non-preemptible (TASK_KILLABLE) state.
+	 */
+	EXPECT_EQ(ioctl(listener, SECCOMP_IOCTL_NOTIF_RECV, &req), 0);
+	/* Kill the process with a fatal signal */
+	EXPECT_EQ(kill(pid, SIGTERM), 0);
+
+	/*
+	 * Wait for the process to exit, and make sure the process terminated
+	 * due to the SIGTERM signal.
+	 */
+	EXPECT_EQ(waitpid(pid, &status, 0), pid);
+	EXPECT_EQ(true, WIFSIGNALED(status));
+	EXPECT_EQ(SIGTERM, WTERMSIG(status));
+}
 
 /*
  * TODO:
