@@ -1193,6 +1193,12 @@ cc_test {
     stem: "seccomp_bpf",
     relative_install_path: "vts_linux_kselftest/seccomp",
     srcs: ["tools/testing/selftests/seccomp/seccomp_bpf.c"],
+    static_libs: [
+        "libcap",
+    ],
+    cflags: [
+        "-Wno-unused-function",
+    ],
     defaults: ["kselftest_template_defaults"],
 }
 
@@ -1580,6 +1586,17 @@ cc_test {
 }
 
 // Vm test
+cc_library_static {
+    name: "kselftest_vm_util",
+    srcs: [
+        "tools/testing/selftests/vm/vm_util.c",
+    ],
+    export_include_dirs: [
+        "tools/testing/selftests/vm",
+    ],
+    defaults: ["kselftest_template_defaults"],
+}
+
 cc_test {
     name: "kselftest_vm_tests_compaction_test",
     stem: "compaction_test",
@@ -1687,7 +1704,10 @@ cc_test {
         "tools/testing/selftests/vm/userfaultfd.c",
     ],
     defaults: ["kselftest_template_defaults"],
-    static_libs: ["libcap"],
+    static_libs: [
+        "libcap",
+        "kselftest_vm_util",
+    ],
 }
 
 cc_test {
