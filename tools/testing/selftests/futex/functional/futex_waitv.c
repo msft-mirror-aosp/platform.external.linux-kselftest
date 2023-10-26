@@ -36,11 +36,11 @@ void usage(char *prog)
 
 void *waiterfn(void *arg)
 {
-	struct timespec to;
+	struct timespec64 to;
 	int res;
 
 	/* setting absolute timeout for futex2 */
-	if (clock_gettime(CLOCK_MONOTONIC, &to))
+	if (gettime64(CLOCK_MONOTONIC, &to))
 		error("gettime64 failed\n", errno);
 
 	to.tv_sec++;
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 {
 	pthread_t waiter;
 	int res, ret = RET_PASS;
-	struct timespec to;
+	struct timespec64 to;
 	int c, i;
 
 	while ((c = getopt(argc, argv, "cht:v:")) != -1) {
@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
 	/* Testing a waiter without FUTEX_32 flag */
 	waitv[0].flags = FUTEX_PRIVATE_FLAG;
 
-	if (clock_gettime(CLOCK_MONOTONIC, &to))
+	if (gettime64(CLOCK_MONOTONIC, &to))
 		error("gettime64 failed\n", errno);
 
 	to.tv_sec++;
@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
 	waitv[0].flags = FUTEX_PRIVATE_FLAG | FUTEX_32;
 	waitv[0].uaddr = 1;
 
-	if (clock_gettime(CLOCK_MONOTONIC, &to))
+	if (gettime64(CLOCK_MONOTONIC, &to))
 		error("gettime64 failed\n", errno);
 
 	to.tv_sec++;
@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
 	/* Testing a NULL address for waiters.uaddr */
 	waitv[0].uaddr = 0x00000000;
 
-	if (clock_gettime(CLOCK_MONOTONIC, &to))
+	if (gettime64(CLOCK_MONOTONIC, &to))
 		error("gettime64 failed\n", errno);
 
 	to.tv_sec++;
@@ -201,7 +201,7 @@ int main(int argc, char *argv[])
 	}
 
 	/* Testing a NULL address for *waiters */
-	if (clock_gettime(CLOCK_MONOTONIC, &to))
+	if (gettime64(CLOCK_MONOTONIC, &to))
 		error("gettime64 failed\n", errno);
 
 	to.tv_sec++;
@@ -217,7 +217,7 @@ int main(int argc, char *argv[])
 	}
 
 	/* Testing an invalid clockid */
-	if (clock_gettime(CLOCK_MONOTONIC, &to))
+	if (gettime64(CLOCK_MONOTONIC, &to))
 		error("gettime64 failed\n", errno);
 
 	to.tv_sec++;
