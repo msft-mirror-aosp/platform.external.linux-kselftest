@@ -429,6 +429,14 @@ static void assert_expected_ioctls_present(uint64_t mode, uint64_t ioctls)
 	uint64_t actual = ioctls & expected;
 
 	if (actual != expected) {
+	/* b/308714445
+	 * _UFFDIO_POISON unsupported in kernel <6.6
+	 */
+#ifdef __ANDROID__
+		if ((expected & ~(1 << _UFFDIO_POISON)) == actual) {
+			return;
+		}
+#endif
 		err("missing ioctl(s): expected %"PRIx64" actual: %"PRIx64,
 		    expected, actual);
 	}
