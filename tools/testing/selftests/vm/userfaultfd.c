@@ -59,6 +59,8 @@
 #include <inttypes.h>
 #include <stdint.h>
 #include <sys/random.h>
+#include <linux/version.h>
+#include <sys/utsname.h>
 
 #include "../kselftest.h"
 #include "vm_util.h"
@@ -407,6 +409,20 @@ static inline uint64_t uffd_minor_feature(void)
 		return 0;
 }
 
+/* b/308714445
+ * _UFFDIO_POISON unsupported in kernel <6.6
+ */
+static uint32_t get_kernel_version(void)
+{
+	uint32_t major, minor, patch;
+	struct utsname info;
+
+	uname(&info);
+	if (sscanf(info.release, "%u.%u.%u", &major, &minor, &patch) != 3)
+		return 0;
+	return KERNEL_VERSION(major, minor, patch);
+}
+
 static uint64_t get_expected_ioctls(uint64_t mode)
 {
 	uint64_t ioctls = UFFD_API_RANGE_IOCTLS;
@@ -419,6 +435,15 @@ static uint64_t get_expected_ioctls(uint64_t mode)
 
 	if (!((mode & UFFDIO_REGISTER_MODE_MINOR) && test_uffdio_minor))
 		ioctls &= ~(1 << _UFFDIO_CONTINUE);
+
+	static uint32_t kernel_version = 0;
+	if (kernel_version == 0) {
+		kernel_version = get_kernel_version();
+	}
+	if (kernel_version < KERNEL_VERSION(6, 6, 0)) {
+		// UFFDIO_POISON not supported until kernel 6.6.
+		ioctls &= ~(1 << _UFFDIO_POISON);
+	}
 
 	return ioctls;
 }
