@@ -441,6 +441,7 @@ cc_test {
 cc_test {
     name: "kselftest_net_tests",
     relative_install_path: "linux-kselftest/net",
+    cflags: ["-Wno-gnu-variable-sized-type-not-at-end"],
     srcs: [
         "tools/testing/selftests/net/socket.c",
         "tools/testing/selftests/net/psock_fanout.c",
