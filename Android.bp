@@ -447,12 +447,6 @@ cc_defaults {
     local_include_dirs: ["android/include"],
     gtest: false,
     no_named_install_directory: true,
-
-    // FIXME: test fails to build with LTO
-    // http://b/241723066
-    lto: {
-        never: true,
-    },
 }
 
 cc_defaults {
