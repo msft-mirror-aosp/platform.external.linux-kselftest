@@ -30,8 +30,6 @@ directories/files:
 
 * `external/linux-kselftest/Android.bp`: Lists build rules for the kselftest modules built in Soong.
 * `external/linux-kselftest/android/`: Contains Android-specific files, aside from Android.[bp, mk] at top level.
-* `external/linux-kselftest/android/Android.kselftest.mk`: Lists build rules for the kselftest modules built under make.
-* `external/linux-kselftest/android/kselftest_test_list.mk`: Lists all tests that will get pulled into VTS - VTS depends on this list.
 * `external/linux-kselftest/android/README`: Lists details on why particular tests are not enabled in Android.
 * `external/linux-kselftest/tools/testing/selftests`: Kselftest sources.
 * `test/vts-testcase/kernel/linux_kselftest/testcases/`: tests to run in VTS kselftest suites are
@@ -80,9 +78,9 @@ faster by doing
 * `external/linux-kselftest$ mma`
 * `external/linux-kselftest$ adb sync data`
 
-The test cases will be located at `/data/nativetest{64,}/linux-kselftest/`.
+The test cases will be located at `/data/nativetest{64,}/vts_linux_kselftest/`.
 
-Build just the kselftest test you care about with `make -j kselftest_<testname>` (listed in `external/linux-kselftest/android/kselftest_test_list.mk`).
+Build just the kselftest test you care about with `m -j kselftest_<testname>` (listed in `external/linux-kselftest/Android.bp`).
 
 What Outstanding Issues Exist?
 ------------------------------
