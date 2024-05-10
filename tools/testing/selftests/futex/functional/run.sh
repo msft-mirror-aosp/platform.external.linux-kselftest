@@ -40,7 +40,6 @@ if [ "$USE_COLOR" -eq 1 ]; then
     COLOR="-c"
 fi
 
-rc=0
 
 echo
 # requeue pi testing
@@ -85,10 +84,8 @@ echo
 run_test ./futex_wait_uninitialized_heap $COLOR
 run_test ./futex_wait_private_mapped_file $COLOR
 
-# b/234151152
-# Disable because system v shared memory not available
-#echo
-#run_test ./futex_wait $COLOR
+echo
+run_test ./futex_wait $COLOR
 
 echo
 run_test ./futex_requeue $COLOR
