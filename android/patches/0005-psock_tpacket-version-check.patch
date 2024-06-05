@@ -1,7 +1,7 @@
-From e92e5b3a6f6800ae39b1e1e3bb02b746b7d215c0 Mon Sep 17 00:00:00 2001
+From fbf1bad8fe8fc8a779668287abfe48af20359350 Mon Sep 17 00:00:00 2001
 From: Edward Liaw <edliaw@google.com>
 Date: Tue, 19 Apr 2022 22:54:43 +0000
-Subject: [PATCH 05/24] psock_tpacket: version check
+Subject: [PATCH 05/20] psock_tpacket: version check
 
 TX_RING support for TPACKET_V3 was added in this commit:
 
@@ -20,7 +20,7 @@ support for TPACKET_V3 on kernels earlier than this.
  1 file changed, 28 insertions(+), 1 deletion(-)
 
 diff --git a/tools/testing/selftests/net/psock_tpacket.c b/tools/testing/selftests/net/psock_tpacket.c
-index 4d5f317ab42c3..9696c9e484d54 100644
+index 4d5f317ab42c..9696c9e484d5 100644
 --- a/tools/testing/selftests/net/psock_tpacket.c
 +++ b/tools/testing/selftests/net/psock_tpacket.c
 @@ -28,6 +28,7 @@
@@ -77,5 +77,5 @@ index 4d5f317ab42c3..9696c9e484d54 100644
  	if (ret)
  		return 1;
 -- 
-2.36.0.550.gb090851708-goog
+2.42.0.609.gbb76f46606-goog
 
