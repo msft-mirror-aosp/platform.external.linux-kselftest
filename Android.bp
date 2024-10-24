@@ -352,7 +352,6 @@ sh_test {
         ":kselftest_x86_tests_test_FISTTP",
         ":kselftest_x86_tests_vdso_restorer",
     ],
-    host_supported: false,
     compile_multilib: "32",
     enabled: false,
     arch: {
