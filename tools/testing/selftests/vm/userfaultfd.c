@@ -1901,6 +1901,11 @@ int main(int argc, char **argv)
 	if (argc < 4)
 		usage();
 
+	/* TODO: b/384985178 - userfaultfd is not supported when emulating 16k pages */
+	if (syscall(__NR_userfaultfd, -1))
+		if (errno == EOPNOTSUPP)
+			errexit(KSFT_SKIP, "userfaultfd is not supported when emulating 16k pages");
+
 	if (signal(SIGALRM, sigalrm) == SIG_ERR)
 		err("failed to arm SIGALRM");
 	alarm(ALARM_INTERVAL_SECS);
