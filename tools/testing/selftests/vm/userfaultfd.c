@@ -1817,7 +1817,10 @@ static void set_test_type(const char *type)
 static void parse_test_type_arg(const char *raw_type)
 {
 	char *buf = strdup(raw_type);
-	uint64_t features = UFFD_API_FEATURES;
+	uint64_t features;
+
+	if (uffd_get_features(&features))
+		errexit(KSFT_SKIP, "Could not get supported uffd features");
 
 	while (buf) {
 		const char *token = strsep(&buf, ":");
