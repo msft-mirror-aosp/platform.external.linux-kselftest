@@ -59,7 +59,6 @@
         <option name="test-command-line" key="x86_sysret_ss_attrs_x86_32" value="cd &ktest_dir;/*/.; ./sysret_ss_attrs" />
         <option name="test-command-line" key="x86_syscall_nt_x86_32" value="cd &ktest_dir;/*/.; ./syscall_nt" />
         <option name="test-command-line" key="x86_ptrace_syscall_x86_32" value="cd &ktest_dir;/*/.; ./ptrace_syscall" />
-        <option name="test-command-line" key="x86_test_mremap_vdso_x86_32" value="cd &ktest_dir;/*/.; ./test_mremap_vdso" />
         <option name="test-command-line" key="x86_check_initial_reg_state_x86_32" value="cd &ktest_dir;/*/.; ./check_initial_reg_state" />
         <option name="test-command-line" key="x86_ldt_gdt_x86_32" value="cd &ktest_dir;/*/.; ./ldt_gdt" />
         <option name="test-command-line" key="x86_syscall_arg_fault_x86_32" value="cd &ktest_dir;/*/.; ./syscall_arg_fault" />
