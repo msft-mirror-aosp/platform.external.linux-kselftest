@@ -154,6 +154,12 @@ static void usage(void)
 			ret, __LINE__);				\
 	} while (0)
 
+#define errexit(exitcode, fmt, ...)     \
+	do {                    \
+		_err(fmt, ##__VA_ARGS__);   \
+		exit(exitcode);         \
+	} while (0)
+
 #define err(fmt, ...)				\
 	do {					\
 		_err(fmt, ##__VA_ARGS__);	\
@@ -1650,9 +1656,67 @@ unsigned long default_huge_page_size(void)
 	return hps;
 }
 
+int uffd_open_dev(unsigned int flags)
+{
+	int fd, uffd;
+
+	fd = open("/dev/userfaultfd", O_RDWR | O_CLOEXEC);
+	if (fd < 0)
+		return fd;
+	uffd = ioctl(fd, USERFAULTFD_IOC_NEW, flags);
+	close(fd);
+
+	return uffd;
+}
+
+int uffd_open_sys(unsigned int flags)
+{
+	return syscall(__NR_userfaultfd, flags);
+}
+
+int uffd_open(unsigned int flags)
+{
+	int uffd = uffd_open_sys(flags);
+
+	if (uffd < 0)
+		uffd = uffd_open_dev(flags);
+
+	return uffd;
+}
+
+int uffd_get_features(uint64_t *features)
+{
+	struct uffdio_api uffdio_api = { .api = UFFD_API, .features = 0 };
+	/*
+	 * This should by default work in most kernels; the feature list
+	 * will be the same no matter what we pass in here.
+	 */
+	int fd = uffd_open(UFFD_USER_MODE_ONLY);
+
+	if (fd < 0)
+		/* Maybe the kernel is older than user-only mode? */
+		fd = uffd_open(0);
+
+	if (fd < 0)
+		return fd;
+
+	if (ioctl(fd, UFFDIO_API, &uffdio_api)) {
+		close(fd);
+		return -errno;
+	}
+
+	*features = uffdio_api.features;
+	close(fd);
+
+	return 0;
+}
+
 static void set_test_type(const char *type)
 {
-	uint64_t features = UFFD_API_FEATURES;
+	uint64_t features;
+
+	if (uffd_get_features(&features))
+		errexit(KSFT_SKIP, "Could not get supported uffd features");
 
 	if (!strcmp(type, "anon")) {
 		test_type = TEST_ANON;
