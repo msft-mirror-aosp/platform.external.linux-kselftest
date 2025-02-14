@@ -1652,24 +1652,7 @@ unsigned long default_huge_page_size(void)
 
 static void set_test_type(const char *type)
 {
-	/* b/234150821
-	 * UFFD_FEATURE_PAGEFAULT_FLAG_WP unsupported in kernel <5.7
-	 */
-#ifdef __ANDROID__
-	uint64_t features = (
-			   UFFD_FEATURE_EVENT_FORK |		\
-			   UFFD_FEATURE_EVENT_REMAP |		\
-			   UFFD_FEATURE_EVENT_REMOVE |		\
-			   UFFD_FEATURE_EVENT_UNMAP |		\
-			   UFFD_FEATURE_MISSING_HUGETLBFS |	\
-			   UFFD_FEATURE_MISSING_SHMEM |		\
-			   UFFD_FEATURE_SIGBUS |		\
-			   UFFD_FEATURE_THREAD_ID |		\
-			   UFFD_FEATURE_MINOR_HUGETLBFS |	\
-			   UFFD_FEATURE_MINOR_SHMEM);
-#else
 	uint64_t features = UFFD_API_FEATURES;
-#endif
 
 	if (!strcmp(type, "anon")) {
 		test_type = TEST_ANON;
