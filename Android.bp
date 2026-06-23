@@ -1728,8 +1728,15 @@ cc_test {
 
 cc_test {
     name: "kselftest_mm_uffd_unit_tests",
-    stem: "uffd-unit-tests",
     relative_install_path: "vts_linux_kselftest/mm",
+    multilib: {
+        lib32: {
+            stem: "uffd-unit-tests",
+        },
+        lib64: {
+            stem: "uffd-unit-tests",
+        },
+    },
     srcs: [
         "tools/testing/selftests/mm/uffd-unit-tests.c",
     ],
