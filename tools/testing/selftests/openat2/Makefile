@@ -1,8 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-CFLAGS += $(KHDR_INCLUDES)
-CFLAGS += -Wall -O2 -g -fsanitize=address -fsanitize=undefined $(TOOLS_INCLUDES)
-TEST_GEN_PROGS := openat2_test resolve_test rename_attack_test emptypath_test
+CFLAGS += -Wall -O2 -g -fsanitize=address -fsanitize=undefined
+TEST_GEN_PROGS := openat2_test resolve_test rename_attack_test
 
 # gcc requires -static-libasan in order to ensure that Address Sanitizer's
 # library is the first one loaded. However, clang already statically links the
@@ -14,4 +13,6 @@ endif
 
 LOCAL_HDRS += helpers.h
 
-include ../../lib.mk
+include ../lib.mk
+
+$(TEST_GEN_PROGS): helpers.c

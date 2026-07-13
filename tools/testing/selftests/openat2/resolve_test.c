@@ -14,81 +14,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "kselftest.h"
 #include "helpers.h"
-#include "kselftest_harness.h"
-
-struct resolve_test {
-	const char *name;
-	const char *dir;
-	const char *path;
-	struct open_how how;
-	bool pass;
-	union {
-		int err;
-		const char *path;
-	} out;
-};
-
-/*
- * Verify a single resolve test case. This must be called from within a TEST_F
- * function with _metadata in scope.
- */
-static void verify_resolve_test(struct __test_metadata *_metadata,
-				int rootfd, int hardcoded_fd,
-				const struct resolve_test *test)
-{
-	struct open_how how = test->how;
-	int dfd, fd;
-	char *fdpath = NULL;
-
-	/* Auto-set O_PATH. */
-	if (!(how.flags & O_CREAT))
-		how.flags |= O_PATH;
-
-	if (test->dir)
-		dfd = openat(rootfd, test->dir, O_PATH | O_DIRECTORY);
-	else
-		dfd = dup(rootfd);
-	ASSERT_GE(dfd, 0) TH_LOG("failed to open dir '%s': %m", test->dir ?: ".");
-	ASSERT_EQ(dup2(dfd, hardcoded_fd), hardcoded_fd);
-
-	fd = sys_openat2(dfd, test->path, &how);
-
-	if (test->pass) {
-		EXPECT_GE(fd, 0) {
-			TH_LOG("%s: expected success, got %d (%s)",
-			       test->name, fd, strerror(-fd));
-		}
-		if (fd >= 0) {
-			EXPECT_TRUE(fdequal(_metadata, fd, rootfd, test->out.path)) {
-				fdpath = fdreadlink(_metadata, fd);
-				TH_LOG("%s: wrong path '%s', expected '%s'",
-				       test->name, fdpath,
-				       test->out.path ?: ".");
-				free(fdpath);
-			}
-		}
-	} else {
-		EXPECT_EQ(test->out.err, fd) {
-			if (fd >= 0) {
-				fdpath = fdreadlink(_metadata, fd);
-				TH_LOG("%s: expected %d (%s), got %d['%s']",
-				       test->name, test->out.err,
-				       strerror(-test->out.err), fd, fdpath);
-				free(fdpath);
-			} else {
-				TH_LOG("%s: expected %d (%s), got %d (%s)",
-				       test->name, test->out.err,
-				       strerror(-test->out.err),
-				       fd, strerror(-fd));
-			}
-		}
-	}
-
-	if (fd >= 0)
-		close(fd);
-	close(dfd);
-}
 
 /*
  * Construct a test directory with the following structure:
@@ -112,110 +39,101 @@ static void verify_resolve_test(struct __test_metadata *_metadata,
  *     |-- absself -> /
  *     |-- self -> ../../root/
  *     |-- garbageself -> /../../root/
- *     |-- passwd -> ../cheeky/../etc/../etc/passwd
- *     |-- abspasswd -> /../cheeky/../etc/../etc/passwd
+ *     |-- passwd -> ../cheeky/../cheeky/../etc/../etc/passwd
+ *     |-- abspasswd -> /../cheeky/../cheeky/../etc/../etc/passwd
  *     |-- dotdotlink -> ../../../../../../../../../../../../../../etc/passwd
  *     `-- garbagelink -> /../../../../../../../../../../../../../../etc/passwd
  */
-FIXTURE(openat2_resolve) {
-	int rootfd;
-	int hardcoded_fd;
-	char *hardcoded_fdpath;
-	char *procselfexe;
-};
-
-FIXTURE_SETUP(openat2_resolve)
+int setup_testdir(void)
 {
-	char dirname[] = "/tmp/ksft-openat2-testdir.XXXXXX";
 	int dfd, tmpfd;
-
-	self->rootfd = -1;
-	self->hardcoded_fd = -1;
-	self->hardcoded_fdpath = NULL;
-	self->procselfexe = NULL;
-
-	/* NOTE: We should be checking for CAP_SYS_ADMIN here... */
-	if (geteuid() != 0)
-		SKIP(return, "all tests require euid == 0");
-	if (!openat2_supported)
-		SKIP(return, "openat2(2) not supported");
+	char dirname[] = "/tmp/ksft-openat2-testdir.XXXXXX";
 
 	/* Unshare and make /tmp a new directory. */
-	ASSERT_EQ(unshare(CLONE_NEWNS), 0);
-	ASSERT_EQ(mount("", "/tmp", "", MS_PRIVATE, ""), 0);
+	E_unshare(CLONE_NEWNS);
+	E_mount("", "/tmp", "", MS_PRIVATE, "");
 
 	/* Make the top-level directory. */
-	ASSERT_NE(mkdtemp(dirname), NULL);
+	if (!mkdtemp(dirname))
+		ksft_exit_fail_msg("setup_testdir: failed to create tmpdir\n");
 	dfd = open(dirname, O_PATH | O_DIRECTORY);
-	ASSERT_GE(dfd, 0);
+	if (dfd < 0)
+		ksft_exit_fail_msg("setup_testdir: failed to open tmpdir\n");
 
 	/* A sub-directory which is actually used for tests. */
-	ASSERT_EQ(mkdirat(dfd, "root", 0755), 0);
+	E_mkdirat(dfd, "root", 0755);
 	tmpfd = openat(dfd, "root", O_PATH | O_DIRECTORY);
-	ASSERT_GE(tmpfd, 0);
+	if (tmpfd < 0)
+		ksft_exit_fail_msg("setup_testdir: failed to open tmpdir\n");
 	close(dfd);
 	dfd = tmpfd;
 
-	ASSERT_EQ(symlinkat("/proc/self/exe", dfd, "procexe"), 0);
-	ASSERT_EQ(symlinkat("/proc/self/root", dfd, "procroot"), 0);
-	ASSERT_EQ(mkdirat(dfd, "root", 0755), 0);
+	E_symlinkat("/proc/self/exe", dfd, "procexe");
+	E_symlinkat("/proc/self/root", dfd, "procroot");
+	E_mkdirat(dfd, "root", 0755);
 
 	/* There is no mountat(2), so use chdir. */
-	ASSERT_EQ(mkdirat(dfd, "mnt", 0755), 0);
-	ASSERT_EQ(fchdir(dfd), 0);
-	ASSERT_EQ(mount("tmpfs", "./mnt", "tmpfs", MS_NOSUID | MS_NODEV, ""), 0);
-	ASSERT_EQ(symlinkat("../mnt/", dfd, "mnt/self"), 0);
-	ASSERT_EQ(symlinkat("/mnt/", dfd, "mnt/absself"), 0);
+	E_mkdirat(dfd, "mnt", 0755);
+	E_fchdir(dfd);
+	E_mount("tmpfs", "./mnt", "tmpfs", MS_NOSUID | MS_NODEV, "");
+	E_symlinkat("../mnt/", dfd, "mnt/self");
+	E_symlinkat("/mnt/", dfd, "mnt/absself");
 
-	ASSERT_EQ(mkdirat(dfd, "etc", 0755), 0);
-	ASSERT_GE(touchat(dfd, "etc/passwd"), 0);
+	E_mkdirat(dfd, "etc", 0755);
+	E_touchat(dfd, "etc/passwd");
 
-	ASSERT_EQ(symlinkat("/newfile3", dfd, "creatlink"), 0);
-	ASSERT_EQ(symlinkat("etc/", dfd, "reletc"), 0);
-	ASSERT_EQ(symlinkat("etc/passwd", dfd, "relsym"), 0);
-	ASSERT_EQ(symlinkat("/etc/", dfd, "absetc"), 0);
-	ASSERT_EQ(symlinkat("/etc/passwd", dfd, "abssym"), 0);
-	ASSERT_EQ(symlinkat("/cheeky", dfd, "abscheeky"), 0);
+	E_symlinkat("/newfile3", dfd, "creatlink");
+	E_symlinkat("etc/", dfd, "reletc");
+	E_symlinkat("etc/passwd", dfd, "relsym");
+	E_symlinkat("/etc/", dfd, "absetc");
+	E_symlinkat("/etc/passwd", dfd, "abssym");
+	E_symlinkat("/cheeky", dfd, "abscheeky");
 
-	ASSERT_EQ(mkdirat(dfd, "cheeky", 0755), 0);
+	E_mkdirat(dfd, "cheeky", 0755);
 
-	ASSERT_EQ(symlinkat("/", dfd, "cheeky/absself"), 0);
-	ASSERT_EQ(symlinkat("../../root/", dfd, "cheeky/self"), 0);
-	ASSERT_EQ(symlinkat("/../../root/", dfd, "cheeky/garbageself"), 0);
+	E_symlinkat("/", dfd, "cheeky/absself");
+	E_symlinkat("../../root/", dfd, "cheeky/self");
+	E_symlinkat("/../../root/", dfd, "cheeky/garbageself");
 
-	ASSERT_EQ(symlinkat("../cheeky/../etc/../etc/passwd",
-			    dfd, "cheeky/passwd"), 0);
-	ASSERT_EQ(symlinkat("/../cheeky/../etc/../etc/passwd",
-			    dfd, "cheeky/abspasswd"), 0);
+	E_symlinkat("../cheeky/../etc/../etc/passwd", dfd, "cheeky/passwd");
+	E_symlinkat("/../cheeky/../etc/../etc/passwd", dfd, "cheeky/abspasswd");
 
-	ASSERT_EQ(symlinkat("../../../../../../../../../../../../../../etc/passwd",
-			    dfd, "cheeky/dotdotlink"), 0);
-	ASSERT_EQ(symlinkat("/../../../../../../../../../../../../../../etc/passwd",
-			    dfd, "cheeky/garbagelink"), 0);
+	E_symlinkat("../../../../../../../../../../../../../../etc/passwd",
+		    dfd, "cheeky/dotdotlink");
+	E_symlinkat("/../../../../../../../../../../../../../../etc/passwd",
+		    dfd, "cheeky/garbagelink");
 
-	self->rootfd = dfd;
-
-	self->hardcoded_fd = open("/dev/null", O_RDONLY);
-	ASSERT_GE(self->hardcoded_fd, 0);
-	ASSERT_GE(asprintf(&self->hardcoded_fdpath, "self/fd/%d",
-			   self->hardcoded_fd), 0);
-	ASSERT_GE(asprintf(&self->procselfexe, "/proc/%d/exe", getpid()), 0);
+	return dfd;
 }
 
-FIXTURE_TEARDOWN(openat2_resolve)
-{
-	free(self->procselfexe);
-	free(self->hardcoded_fdpath);
-	if (self->hardcoded_fd >= 0)
-		close(self->hardcoded_fd);
-	if (self->rootfd >= 0)
-		close(self->rootfd);
-}
+struct basic_test {
+	const char *name;
+	const char *dir;
+	const char *path;
+	struct open_how how;
+	bool pass;
+	union {
+		int err;
+		const char *path;
+	} out;
+};
 
-/* Attempts to cross the dirfd should be blocked with -EXDEV. */
-TEST_F(openat2_resolve, resolve_beneath)
+#define NUM_OPENAT2_OPATH_TESTS 88
+
+void test_openat2_opath_tests(void)
 {
-	struct resolve_test tests[] = {
+	int rootfd, hardcoded_fd;
+	char *procselfexe, *hardcoded_fdpath;
+
+	E_asprintf(&procselfexe, "/proc/%d/exe", getpid());
+	rootfd = setup_testdir();
+
+	hardcoded_fd = open("/dev/null", O_RDONLY);
+	E_assert(hardcoded_fd >= 0, "open fd to hardcode");
+	E_asprintf(&hardcoded_fdpath, "self/fd/%d", hardcoded_fd);
+
+	struct basic_test tests[] = {
+		/** RESOLVE_BENEATH **/
 		/* Attempts to cross dirfd should be blocked. */
 		{ .name = "[beneath] jump to /",
 		  .path = "/",			.how.resolve = RESOLVE_BENEATH,
@@ -288,17 +206,9 @@ TEST_F(openat2_resolve, resolve_beneath)
 		{ .name = "[beneath] tricky absolute + garbage link outside $root",
 		  .path = "abscheeky/garbagelink", .how.resolve = RESOLVE_BENEATH,
 		  .out.err = -EXDEV,		.pass = false },
-	};
 
-	for (int i = 0; i < ARRAY_SIZE(tests); i++)
-		verify_resolve_test(_metadata, self->rootfd,
-				    self->hardcoded_fd, &tests[i]);
-}
-
-/* All attempts to cross the dirfd will be scoped-to-root. */
-TEST_F(openat2_resolve, resolve_in_root)
-{
-	struct resolve_test tests[] = {
+		/** RESOLVE_IN_ROOT **/
+		/* All attempts to cross the dirfd will be scoped-to-root. */
 		{ .name = "[in_root] jump to /",
 		  .path = "/",			.how.resolve = RESOLVE_IN_ROOT,
 		  .out.path = NULL,		.pass = true },
@@ -387,17 +297,8 @@ TEST_F(openat2_resolve, resolve_in_root)
 						.how.mode = 0700,
 						.how.resolve = RESOLVE_IN_ROOT,
 		  .out.path = "newfile3",	.pass = true },
-	};
 
-	for (int i = 0; i < ARRAY_SIZE(tests); i++)
-		verify_resolve_test(_metadata, self->rootfd,
-				    self->hardcoded_fd, &tests[i]);
-}
-
-/* Crossing mount boundaries should be blocked. */
-TEST_F(openat2_resolve, resolve_no_xdev)
-{
-	struct resolve_test tests[] = {
+		/** RESOLVE_NO_XDEV **/
 		/* Crossing *down* into a mountpoint is disallowed. */
 		{ .name = "[no_xdev] cross into $mnt",
 		  .path = "mnt",		.how.resolve = RESOLVE_NO_XDEV,
@@ -446,19 +347,10 @@ TEST_F(openat2_resolve, resolve_no_xdev)
 		  .out.err = -EXDEV,			.pass = false },
 		/* Except magic-link jumps inside the same vfsmount. */
 		{ .name = "[no_xdev] jump through magic-link to same procfs",
-		  .dir = "/proc", .path = self->hardcoded_fdpath, .how.resolve = RESOLVE_NO_XDEV,
-		  .out.path = "/proc",				  .pass = true, },
-	};
+		  .dir = "/proc", .path = hardcoded_fdpath, .how.resolve = RESOLVE_NO_XDEV,
+		  .out.path = "/proc",			    .pass = true, },
 
-	for (int i = 0; i < ARRAY_SIZE(tests); i++)
-		verify_resolve_test(_metadata, self->rootfd,
-				    self->hardcoded_fd, &tests[i]);
-}
-
-/* Procfs-style magic-link resolution should be blocked. */
-TEST_F(openat2_resolve, resolve_no_magiclinks)
-{
-	struct resolve_test tests[] = {
+		/** RESOLVE_NO_MAGICLINKS **/
 		/* Regular symlinks should work. */
 		{ .name = "[no_magiclinks] ordinary relative symlink",
 		  .path = "relsym",		.how.resolve = RESOLVE_NO_MAGICLINKS,
@@ -473,7 +365,7 @@ TEST_F(openat2_resolve, resolve_no_magiclinks)
 		{ .name = "[no_magiclinks] normal path to magic-link with O_NOFOLLOW",
 		  .path = "/proc/self/exe",	.how.flags = O_NOFOLLOW,
 						.how.resolve = RESOLVE_NO_MAGICLINKS,
-		  .out.path = self->procselfexe, .pass = true },
+		  .out.path = procselfexe,	.pass = true },
 		{ .name = "[no_magiclinks] symlink to magic-link path component",
 		  .path = "procroot/etc",	.how.resolve = RESOLVE_NO_MAGICLINKS,
 		  .out.err = -ELOOP,		.pass = false },
@@ -484,17 +376,8 @@ TEST_F(openat2_resolve, resolve_no_magiclinks)
 		  .path = "/proc/self/root/etc", .how.flags = O_NOFOLLOW,
 						 .how.resolve = RESOLVE_NO_MAGICLINKS,
 		  .out.err = -ELOOP,		.pass = false },
-	};
 
-	for (int i = 0; i < ARRAY_SIZE(tests); i++)
-		verify_resolve_test(_metadata, self->rootfd,
-				    self->hardcoded_fd, &tests[i]);
-}
-
-/* All symlink resolution should be blocked. */
-TEST_F(openat2_resolve, resolve_no_symlinks)
-{
-	struct resolve_test tests[] = {
+		/** RESOLVE_NO_SYMLINKS **/
 		/* Normal paths should work. */
 		{ .name = "[no_symlinks] ordinary path to '.'",
 		  .path = ".",			.how.resolve = RESOLVE_NO_SYMLINKS,
@@ -553,9 +436,88 @@ TEST_F(openat2_resolve, resolve_no_symlinks)
 		  .out.err = -ELOOP,		.pass = false },
 	};
 
-	for (int i = 0; i < ARRAY_SIZE(tests); i++)
-		verify_resolve_test(_metadata, self->rootfd,
-				    self->hardcoded_fd, &tests[i]);
+	BUILD_BUG_ON(ARRAY_LEN(tests) != NUM_OPENAT2_OPATH_TESTS);
+
+	for (int i = 0; i < ARRAY_LEN(tests); i++) {
+		int dfd, fd;
+		char *fdpath = NULL;
+		bool failed;
+		void (*resultfn)(const char *msg, ...) = ksft_test_result_pass;
+		struct basic_test *test = &tests[i];
+
+		if (!openat2_supported) {
+			ksft_print_msg("openat2(2) unsupported\n");
+			resultfn = ksft_test_result_skip;
+			goto skip;
+		}
+
+		/* Auto-set O_PATH. */
+		if (!(test->how.flags & O_CREAT))
+			test->how.flags |= O_PATH;
+
+		if (test->dir)
+			dfd = openat(rootfd, test->dir, O_PATH | O_DIRECTORY);
+		else
+			dfd = dup(rootfd);
+		E_assert(dfd, "failed to openat root '%s': %m", test->dir);
+
+		E_dup2(dfd, hardcoded_fd);
+
+		fd = sys_openat2(dfd, test->path, &test->how);
+		if (test->pass)
+			failed = (fd < 0 || !fdequal(fd, rootfd, test->out.path));
+		else
+			failed = (fd != test->out.err);
+		if (fd >= 0) {
+			fdpath = fdreadlink(fd);
+			close(fd);
+		}
+		close(dfd);
+
+		if (failed) {
+			resultfn = ksft_test_result_fail;
+
+			ksft_print_msg("openat2 unexpectedly returned ");
+			if (fdpath)
+				ksft_print_msg("%d['%s']\n", fd, fdpath);
+			else
+				ksft_print_msg("%d (%s)\n", fd, strerror(-fd));
+		}
+
+skip:
+		if (test->pass)
+			resultfn("%s gives path '%s'\n", test->name,
+				 test->out.path ?: ".");
+		else
+			resultfn("%s fails with %d (%s)\n", test->name,
+				 test->out.err, strerror(-test->out.err));
+
+		fflush(stdout);
+		free(fdpath);
+	}
+
+	free(procselfexe);
+	close(rootfd);
+
+	free(hardcoded_fdpath);
+	close(hardcoded_fd);
 }
 
-TEST_HARNESS_MAIN
+#define NUM_TESTS NUM_OPENAT2_OPATH_TESTS
+
+int main(int argc, char **argv)
+{
+	ksft_print_header();
+	ksft_set_plan(NUM_TESTS);
+
+	/* NOTE: We should be checking for CAP_SYS_ADMIN here... */
+	if (geteuid() != 0)
+		ksft_exit_skip("all tests require euid == 0\n");
+
+	test_openat2_opath_tests();
+
+	if (ksft_get_fail_cnt() + ksft_get_error_cnt() > 0)
+		ksft_exit_fail();
+	else
+		ksft_exit_pass();
+}
