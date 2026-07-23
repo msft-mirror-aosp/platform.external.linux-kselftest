@@ -26,7 +26,6 @@
 #include <sys/timex.h>
 #include <time.h>
 #include "kselftest.h"
-#include <string.h>
 
 #define NSEC_PER_SEC 1000000000LL
 
@@ -89,30 +88,11 @@ void get_monotonic_and_raw(struct timespec *mon, struct timespec *raw)
 	}
 }
 
-static void usage(char *argv0)
-{
-	printf("Usage: %s [sleep_secs]\n", argv0);
-	printf("  sleep_secs: time to sleep in seconds to estimate clock drift (default: 120s)\n");
-}
-
 int main(int argc, char **argv)
 {
 	struct timespec mon, raw, start, end;
 	long long delta1, delta2, interval, eppm, ppm;
 	struct timex tx1, tx2;
-	int sleep_sec = 120;
-
-	if (argc > 1) {
-		if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
-			usage(argv[0]);
-			ksft_exit_pass();
-		}
-		sleep_sec = atoi(argv[1]);
-		if (sleep_sec <= 0) {
-			printf("Invalid sleep time, using default 120s\n");
-			sleep_sec = 120;
-		}
-	}
 
 	setbuf(stdout, NULL);
 
@@ -130,9 +110,9 @@ int main(int argc, char **argv)
 	if (tx1.offset)
 		printf("WARNING: ADJ_OFFSET in progress, this will cause inaccurate results\n");
 
-	printf("Estimating clock drift (%ds): ", sleep_sec);
+	printf("Estimating clock drift: ");
 	fflush(stdout);
-	sleep(sleep_sec);
+	sleep(120);
 
 	get_monotonic_and_raw(&mon, &raw);
 	end = mon;
