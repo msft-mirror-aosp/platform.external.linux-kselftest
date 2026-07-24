@@ -53,7 +53,7 @@
         <option name="test-command-line" key="timers_nanosleep_arm_64" value="cd &ktest_dir;/*/.; ./nanosleep" />
         <option name="test-command-line" key="timers_nsleep_lat_arm_64" value="cd &ktest_dir;/*/.; ./nsleep-lat" />
         <option name="test-command-line" key="timers_posix_timers_arm_64" value="cd &ktest_dir;/*/.; ./posix_timers" />
-        <option name="test-command-line" key="timers_raw_skew_arm_64" value="cd &ktest_dir;/*/.; ./raw_skew" />
+        <option name="test-command-line" key="timers_raw_skew_arm_64" value="cd &ktest_dir;/*/.; ./raw_skew 30" />
         <option name="test-command-line" key="timers_set_tai_arm_64" value="cd &ktest_dir;/*/.; ./set-tai" />
         <option name="test-command-line" key="timers_set_timer_lat_arm_64" value="cd &ktest_dir;/*/.; ./set-timer-lat" />
         <option name="test-command-line" key="timers_threadtest_arm_64" value="cd &ktest_dir;/*/.; ./threadtest" />
