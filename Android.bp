@@ -1217,21 +1217,13 @@ cc_test {
     name: "kselftest_size_test_get_size",
     stem: "get_size",
     relative_install_path: "vts_linux_kselftest/size",
-    srcs: [
-        "tools/testing/selftests/size/get_size.c",
-    ],
-    cflags: [
-        "-ffreestanding",
-        "-fno-stack-protector",
-    ],
-    stl: "none",
+    srcs: ["tools/testing/selftests/size/get_size.c"],
     arch: {
         x86_64: {
             cflags: ["-mstackrealign"],
         },
     },
     defaults: ["kselftest_template_defaults"],
-    static_executable: true,
     nocrt: true,
     // coverage runtime calls atexit, which is unavailable with nocrt.
     native_coverage: false,
