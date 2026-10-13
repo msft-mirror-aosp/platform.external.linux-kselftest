@@ -107,9 +107,8 @@ sh_test {
         ":kselftest_timer_tests_threadtest",
         ":kselftest_timer_tests_valid-adjtimex",
         ":kselftest_mm_compaction_test",
-        ":kselftest_mm_hugepage_mmap",
-        ":kselftest_mm_hugepage_shm",
-        ":kselftest_mm_map_hugetlb",
+        ":kselftest_mm_hugetlb_mmap",
+        ":kselftest_mm_hugetlb_shm",
         ":kselftest_mm_mlock_random_test",
         ":kselftest_mm_mlock2_tests",
         ":kselftest_mm_on_fault_limit",
@@ -180,9 +179,8 @@ sh_test {
         ":kselftest_timer_tests_threadtest",
         ":kselftest_timer_tests_valid-adjtimex",
         ":kselftest_mm_compaction_test",
-        ":kselftest_mm_hugepage_mmap",
-        ":kselftest_mm_hugepage_shm",
-        ":kselftest_mm_map_hugetlb",
+        ":kselftest_mm_hugetlb_mmap",
+        ":kselftest_mm_hugetlb_shm",
         ":kselftest_mm_mlock_random_test",
         ":kselftest_mm_mlock2_tests",
         ":kselftest_mm_on_fault_limit",
@@ -253,9 +251,8 @@ sh_test {
         ":kselftest_timer_tests_threadtest",
         ":kselftest_timer_tests_valid-adjtimex",
         ":kselftest_mm_compaction_test",
-        ":kselftest_mm_hugepage_mmap",
-        ":kselftest_mm_hugepage_shm",
-        ":kselftest_mm_map_hugetlb",
+        ":kselftest_mm_hugetlb_mmap",
+        ":kselftest_mm_hugetlb_shm",
         ":kselftest_mm_mlock_random_test",
         ":kselftest_mm_mlock2_tests",
         ":kselftest_mm_on_fault_limit",
@@ -328,9 +325,8 @@ sh_test {
         ":kselftest_timer_tests_threadtest",
         ":kselftest_timer_tests_valid-adjtimex",
         ":kselftest_mm_compaction_test",
-        ":kselftest_mm_hugepage_mmap",
-        ":kselftest_mm_hugepage_shm",
-        ":kselftest_mm_map_hugetlb",
+        ":kselftest_mm_hugetlb_mmap",
+        ":kselftest_mm_hugetlb_shm",
         ":kselftest_mm_mlock_random_test",
         ":kselftest_mm_mlock2_tests",
         ":kselftest_mm_on_fault_limit",
@@ -1589,7 +1585,7 @@ cc_library_static {
     name: "kselftest_vm_util",
     srcs: [
         "tools/testing/selftests/mm/vm_util.c",
-        "tools/testing/selftests/mm/thp_settings.c",
+        "tools/testing/selftests/mm/hugepage_settings.c",
     ],
     export_include_dirs: [
         "tools/testing/selftests/mm",
@@ -1617,37 +1613,32 @@ cc_test {
         "tools/testing/selftests/mm/compaction_test.c",
     ],
     defaults: ["kselftest_template_defaults"],
-    static_libs: ["libcap"],
+    static_libs: [
+        "libcap",
+        "kselftest_vm_util",
+    ],
 }
 
 cc_test {
-    name: "kselftest_mm_hugepage_mmap",
-    stem: "hugepage-mmap",
+    name: "kselftest_mm_hugetlb_mmap",
+    stem: "hugetlb-mmap",
     relative_install_path: "vts_linux_kselftest/mm",
     srcs: [
-        "tools/testing/selftests/mm/hugepage-mmap.c",
+        "tools/testing/selftests/mm/hugetlb-mmap.c",
     ],
     defaults: ["kselftest_template_defaults"],
-    static_libs: ["libcap"],
-}
-
-cc_test {
-    name: "kselftest_mm_hugepage_shm",
-    stem: "hugepage-shm",
-    relative_install_path: "vts_linux_kselftest/mm",
-    srcs: [
-        "tools/testing/selftests/mm/hugepage-shm.c",
+    static_libs: [
+        "libcap",
+        "kselftest_vm_util",
     ],
-    defaults: ["kselftest_template_defaults"],
-    static_libs: ["libcap"],
 }
 
 cc_test {
-    name: "kselftest_mm_map_hugetlb",
-    stem: "map_hugetlb",
+    name: "kselftest_mm_hugetlb_shm",
+    stem: "hugetlb-shm",
     relative_install_path: "vts_linux_kselftest/mm",
     srcs: [
-        "tools/testing/selftests/mm/map_hugetlb.c",
+        "tools/testing/selftests/mm/hugetlb-shm.c",
     ],
     defaults: ["kselftest_template_defaults"],
     static_libs: [
