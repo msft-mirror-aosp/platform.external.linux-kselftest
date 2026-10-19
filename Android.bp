@@ -84,6 +84,7 @@ sh_test {
         ":kselftest_futex_futex_waitv",
         ":kselftest_futex_futex_priv_hash",
         ":kselftest_futex_futex_numa_mpol",
+        ":kselftest_futex_futex_lock_pi_exiting",
         ":kselftest_futex_functional_run.sh",
         ":kselftest_kcmp_tests_kcmp_test",
         ":kselftest_net_tests_socket",
@@ -156,6 +157,7 @@ sh_test {
         ":kselftest_futex_futex_waitv",
         ":kselftest_futex_futex_priv_hash",
         ":kselftest_futex_futex_numa_mpol",
+        ":kselftest_futex_futex_lock_pi_exiting",
         ":kselftest_futex_functional_run.sh",
         ":kselftest_kcmp_tests_kcmp_test",
         ":kselftest_net_tests_socket",
@@ -228,6 +230,7 @@ sh_test {
         ":kselftest_futex_futex_waitv",
         ":kselftest_futex_futex_priv_hash",
         ":kselftest_futex_futex_numa_mpol",
+        ":kselftest_futex_futex_lock_pi_exiting",
         ":kselftest_futex_functional_run.sh",
         ":kselftest_kcmp_tests_kcmp_test",
         ":kselftest_net_tests_socket",
@@ -303,6 +306,7 @@ sh_test {
         ":kselftest_futex_futex_waitv",
         ":kselftest_futex_futex_priv_hash",
         ":kselftest_futex_futex_numa_mpol",
+        ":kselftest_futex_futex_lock_pi_exiting",
         ":kselftest_futex_functional_run.sh",
         ":kselftest_kcmp_tests_kcmp_test",
         ":kselftest_net_tests_socket",
@@ -899,6 +903,24 @@ cc_test {
     relative_install_path: "vts_linux_kselftest/futex/functional",
     srcs: [
         "tools/testing/selftests/futex/functional/futex_numa_mpol.c",
+    ],
+    local_include_dirs: [
+        "tools/testing/selftests/futex/include",
+        "tools/testing/selftests",
+    ],
+    cflags: [
+        "-D_GNU_SOURCE",
+        "-pthread",
+    ],
+    defaults: ["kselftest_defaults"],
+}
+
+cc_test {
+    name: "kselftest_futex_futex_lock_pi_exiting",
+    stem: "futex_lock_pi_exiting",
+    relative_install_path: "vts_linux_kselftest/futex/functional",
+    srcs: [
+        "tools/testing/selftests/futex/functional/futex_lock_pi_exiting.c",
     ],
     local_include_dirs: [
         "tools/testing/selftests/futex/include",
